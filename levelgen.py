@@ -37,9 +37,9 @@ DESIGNS = [ # These are based on default field width and height
 
 FILLS = [   # These are based on default field width and height
     Fill(name = 'ireland', cost = 1, chance_weight = 4,
-         output ='000000'),
+         output ='222222'),
     Fill(name = 'ireland2', cost = 1, chance_weight = 4,
-         output ='000000')
+         output ='222222')
 ]
 
 
@@ -66,7 +66,7 @@ def _weighted_roll(elements_set):
 
 def _apply_element(element, list, config = GeneratorConfig()):
     """Applies the output of a design element to the list of bubbles and returns the new list."""
-    list_to_return = []
+    list_to_return = list
 
     for bubble in element.output:
         if element.override == True:
@@ -79,11 +79,23 @@ def _apply_element(element, list, config = GeneratorConfig()):
     return list_to_return
 
 
-def _list_to_2D(list):
-    return list
+def _list_to_2D(list, config = GeneratorConfig()):
+    """Changes the bubble list input to a 2D List to return."""
+    list_to_return = []
+    for index in range(0, config.field_height):
+        temp_list = []
+        if index % 2 == 0:
+            for i in range(0, config.field_width):
+                temp_list.append(list.pop(0))
+        else:
+            for i in range(0, config.field_width-1):
+                temp_list.append(list.pop(0))
+        list_to_return.append(temp_list)
+    return list_to_return
 
 
 def _list_to_string(list):
+    """Changes the bubble list input to a string to return."""
     string_to_return = ''
 
     for entry in list:
@@ -127,4 +139,4 @@ def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=D
     else: # Give output as 2D List.
         return _list_to_2D(bubble_list)
     
-print(generate_level(1,1,1, return_string=True))
+print(generate_level(1,1,1))
