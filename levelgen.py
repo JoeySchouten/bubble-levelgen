@@ -46,17 +46,17 @@ FILLS = [   # These are based on default field width and height
 def _weighted_roll(elements_set):
     """Return a random index from a list with items with weighted chances"""
     
-    # Get the total weight and accumulated weights
+    # Get the total weight and accumulated weights.
     total_weight = 0
     accumulated_weights = []
     for element in elements_set:
         total_weight += element.chance_weight
         accumulated_weights += [total_weight]
 
-    # Roll some number between 0 and the total of all weighted chances
+    # Roll on the total weight
     roll = random.randint(0, total_weight)
 
-    # Let's find our winner
+    # Find the element matching the roll result.
     for element in elements_set:
         if roll < accumulated_weights[elements_set.index(element)]:
             return elements_set.index(element)
@@ -79,6 +79,7 @@ def _apply_element(element, list, config = GeneratorConfig()):
 def _list_to_2D(list, config = GeneratorConfig()):
     """Changes the bubble list input to a 2D List to return."""
     list_to_return = []
+
     for index in range(0, config.field_height):
         temp_list = []
         if index % 2 == 0:
@@ -88,6 +89,7 @@ def _list_to_2D(list, config = GeneratorConfig()):
             for i in range(0, config.field_width-1):
                 temp_list.append(list.pop(0))
         list_to_return.append(temp_list)
+        
     return list_to_return
 
 
