@@ -8,7 +8,7 @@ class DesignElement:
     cost: int
     chance_weight: int
     output: str
-    override: bool = False
+    override: bool = True
 
 @dataclass
 class Fill:
@@ -68,14 +68,11 @@ def _apply_element(element, list, config = GeneratorConfig()):
     """Applies the output of a design element to the list of bubbles and returns the new list."""
     list_to_return = list
 
-    for bubble in element.output:
-        if element.override == True:
-            list_to_return += [bubble]
-        elif list[element.output.index(bubble)] == 0:
-            list_to_return += [bubble]
-        else:
-            list_to_return += [list[element.output.index(bubble)]]
+    for index in range(len(element.output)):
+        if element.override == True or list[index] == 0:
+            list_to_return[index] = int(element.output[index])
 
+    print(len(list_to_return))
     return list_to_return
 
 
