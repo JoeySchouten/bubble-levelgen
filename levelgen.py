@@ -7,13 +7,17 @@ class DesignElement:
     name: str
     cost: int
     chance: int
-    override: bool
     output: str
+    override: bool = False
 
 @dataclass
-class FillElement:
+class Fill:
     """Level Design Fill that can be used to fill in the spaces between design elements."""
-    pass
+    name: str
+    cost: int
+    chance: int
+    output: str
+    override: bool = False
 
 @dataclass
 class GeneratorConfig:
@@ -23,6 +27,16 @@ class GeneratorConfig:
     diff_per_star: int = 1
     field_width: int = 9
     field_height: int = 8
+
+DESIGN_ELEMENTS = [ # These are based on default field width and height
+    DesignElement(name = 'torii', cost = 1, chance = 1, 
+                  output ='200000022222222002002000222220020000202000002')
+]
+
+FILLS = [   # These are based on default field width and height
+    Fill(name = 'ireland', cost = 1, chance = 1, 
+         output ='')
+]
 
 def _weighted_roll(elements_set):
     """Return a random item with a weighted chance"""
