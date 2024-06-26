@@ -42,6 +42,7 @@ FILLS = [   # These are based on default field width and height
          output ='000000')
 ]
 
+
 def _weighted_roll(elements_set):
     """Return a random index from a list with items with weighted chances"""
     
@@ -58,23 +59,38 @@ def _weighted_roll(elements_set):
     # Let's find our winner
     for element in elements_set:
         if roll < accumulated_weights[elements_set.index(element)]:
-            print(elements_set.index(element))
             return elements_set.index(element)
+        
     return -1 #TODO: fix this, this is a quick fix for falling out of the element sets.
-            
+
+
 def _apply_element(element, list, config = GeneratorConfig()):
+    """Applies the output of a design element to the list of bubbles and returns the new list."""
     list_to_return = []
+
+    for bubble in element.output:
+        if element.override == True:
+            list_to_return += [bubble]
+        elif list[element.output.index(bubble)] == 0:
+            list_to_return += [bubble]
+        else:
+            list_to_return += [list[element.output.index(bubble)]]
+
     return list_to_return
 
-def _apply_fill(fill, list, config = GeneratorConfig()):
-    list_to_return = []
-    return list_to_return
 
 def _list_to_2D(list):
     return list
 
+
 def _list_to_string(list):
-    return list
+    string_to_return = ''
+
+    for entry in list:
+        string_to_return += str(entry)
+    
+    return string_to_return
+
 
 def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=DESIGNS, fill_set=FILLS, return_string=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
@@ -104,11 +120,11 @@ def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=D
         break
 
     # Apply the fill to our level
-    bubble_list = _apply_fill(selected_fill, bubble_list)
+    bubble_list = _apply_element(selected_fill, bubble_list)
 
     if return_string: # Give output as one string.
         return _list_to_string(bubble_list)
     else: # Give output as 2D List.
         return _list_to_2D(bubble_list)
     
-print(generate_level(1,1,1))
+print(generate_level(1,1,1, return_string=True))
