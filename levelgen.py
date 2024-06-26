@@ -6,7 +6,7 @@ class DesignElement:
     """Level Design Element that provides a string that can be loaded onto the level arrays."""
     name: str
     cost: int
-    chance: int
+    chance_weight: int
     output: str
     override: bool = False
 
@@ -15,7 +15,7 @@ class Fill:
     """Level Design Fill that can be used to fill in the spaces between design elements."""
     name: str
     cost: int
-    chance: int
+    chance_weight: int
     output: str
     override: bool = False
 
@@ -28,35 +28,39 @@ class GeneratorConfig:
     field_width: int = 9
     field_height: int = 8
 
-DESIGN_ELEMENTS = [ # These are based on default field width and height
-    DesignElement(name = 'torii', cost = 1, chance = 1, 
-                  output ='200000022222222002002000222220020000202000002')
+DESIGNS = [ # These are based on default field width and height
+    DesignElement(name = 'torii', cost = 1, chance_weight = 1,
+                  output ='200000022222222002002000222220020000202000002'),
+    DesignElement(name = 'torii2', cost = 1, chance_weight = 1, 
+                  output ='200000022222222002002000222220020000202000002')            
 ]
 
 FILLS = [   # These are based on default field width and height
-    Fill(name = 'ireland', cost = 1, chance = 1, 
-         output ='')
+    Fill(name = 'ireland', cost = 1, chance_weight = 4,
+         output ='000000'),
+    Fill(name = 'ireland2', cost = 1, chance_weight = 4,
+         output ='000000')
 ]
 
 def _weighted_roll(elements_set):
-    """Return a random item with a weighted chance""" #thank you, Lemon ^^
+    """Return a random index from a list with items with weighted chances"""
     
-    # Get the total chance
-    total = sum([element.chance for element in elements_set])
+    # Get the total weight and accumulated weights
+    total_weight = 0
+    accumulated_weights = []
+    for element in elements_set:
+        total_weight += element.chance_weight
+        accumulated_weights += [total_weight]
 
     # Roll some number between 0 and the total of all weighted chances
-    roll = random.randint(0, total + 1)
+    roll = random.randint(0, total_weight)
 
     # Let's find our winner
-    chance_so_far = 0    
     for element in elements_set:
-
-        # Offset the chance by chance_so_far, otherwise the roll might 
-        # be higher than even the highest item.chance
-        if roll < (chance_so_far + element.chance):
-            return element
-        else:
-            chance_so_far += element.chance
+        if roll < accumulated_weights[elements_set.index(element)]:
+            print(elements_set.index(element))
+            return elements_set.index(element)
+    return -1 #TODO: fix this, this is a quick fix for falling out of the element sets.
             
 def _apply_element(element, list, config = GeneratorConfig()):
     list_to_return = []
@@ -72,7 +76,7 @@ def _list_to_2D(list):
 def _list_to_string(list):
     return list
 
-def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=DESIGN_ELEMENTS, fill_set=FILLS, return_string=False):
+def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=DESIGNS, fill_set=FILLS, return_string=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
     based on entered config parameters, element and fill arrays."""
 
@@ -89,13 +93,13 @@ def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=D
             bubble_list += ([0] * (config.field_width-1))
 
     # Pick a random fill, save it for later, and add the cost to what we have spent.
-    selected_fill = _weighted_roll(fill_set)
-    #spent_difficulty += selected_fill.cost
+    selected_fill = fill_set[_weighted_roll(fill_set)]
+    spent_difficulty += selected_fill.cost
 
     # Roll design elements, apply them, and add the cost to what we have spent.
     while spent_difficulty < level_difficulty:
-        selected_element = _weighted_roll(elements_set)
-        #spent_difficulty += selected_element.cost
+        selected_element = elements_set[_weighted_roll(elements_set)]
+        spent_difficulty += selected_element.cost
         bubble_list = _apply_element(selected_element, bubble_list)
         break
 
