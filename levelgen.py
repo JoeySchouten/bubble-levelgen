@@ -126,7 +126,6 @@ def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=D
         selected_element = elements_set[_weighted_roll(elements_set)]
         spent_difficulty += selected_element.cost
         bubble_list = _apply_element(selected_element, bubble_list)
-        break
 
     # Apply the fill to our level
     bubble_list = _apply_element(selected_fill, bubble_list)
