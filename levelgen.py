@@ -1,6 +1,22 @@
 from dataclasses import dataclass
 import random
 
+#TODO:
+# add the ability to exclude elements or fills
+# add the ability to have design elements placed randomly
+# Do not let fills/elements write zeroes
+# move consts to own file
+# add ability to set elements to use the fill option
+# add ability to take additional arguments to determine # of colors
+# add ability to use letters as color variables in elements and fills
+# change apply element to apply fill and make new function for element
+# change fill/element output to Lists -> allows for double digit ints
+# change weighted roll to return element again instead of index
+# add description to README
+# add functions to README
+# add string caveat to README -> can only do 0-9 as string
+# fix weighted roll quick fix
+
 @dataclass
 class DesignElement:
     """Level Design Element that provides a string that can be loaded onto the level arrays."""
@@ -103,7 +119,7 @@ def _list_to_string(list):
     return string_to_return
 
 
-def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=DESIGNS, fill_set=FILLS, return_string=False):
+def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set=DESIGNS, fill_set=FILLS, return_string=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
     based on entered config parameters, element and fill arrays."""
 
@@ -136,5 +152,3 @@ def generate_level(world, level, stars, config=GeneratorConfig(), elements_set=D
         return _list_to_string(bubble_list)
     else: # Give output as 2D List.
         return _list_to_2D(bubble_list)
-    
-print(generate_level(1,1,1))
