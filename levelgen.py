@@ -21,6 +21,13 @@ import random
 # add description to README
 # add functions to README
 # add string caveat to README -> can only do 0-9 as string
+# change references to 9x8 field to 8x8
+# add caveat that if you use treat_as_fill on design element you need to deliver one single list
+# if not, deliver a list for each row
+# change dataclass types for output from int to list
+
+# Fills and Elements
+# add all elements and fills from level gen doc
 
 @dataclass
 class DesignElement:
@@ -48,7 +55,7 @@ class GeneratorConfig:
     diff_per_level: int = 1
     diff_per_star: int = 1
     field_width: int = 8
-    field_height: int = 7
+    field_height: int = 8
 
 DESIGNS = [ # These are based on default field width and height
     DesignElement(name = 'torii', cost = 1, chance_weight = 1, treat_as_fill = True,
@@ -69,9 +76,21 @@ DESIGNS = [ # These are based on default field width and height
 
 FILLS = [   # These are based on default field width and height
     Fill(name = 'ireland', cost = 1, chance_weight = 4,
-         output =[2,2,2,2,2,2]),
+         output =[9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3]),
     Fill(name = 'ireland2', cost = 1, chance_weight = 4,
-         output =[2,2,2,2,2,2])
+         output =[9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3])
 ]
 
 
@@ -97,6 +116,12 @@ def _weighted_roll(elements_set):
 
 def _apply_element(element, list, config = GeneratorConfig()):
     list_to_return = list
+
+    for index in range(len(element.output)):
+        if element.override == True or list_to_return[index] == 0:
+            if element.output[index] != 0:
+                list_to_return[index] = int(element.output[index])
+
     return list_to_return
 
 def _apply_fill(fill, list, config = GeneratorConfig()):
