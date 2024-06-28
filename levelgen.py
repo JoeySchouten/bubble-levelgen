@@ -65,13 +65,9 @@ DESIGNS = [ # These are based on default field width and height
                              0, 2, 2, 2, 2, 2, 0, 
                             0, 2, 0, 0, 0, 0 ,2, 0, 
                              2, 0, 0, 0, 0, 0, 2]),
-    DesignElement(name = 'torii2', cost = 1, chance_weight = 1, treat_as_fill = True,
-                  output = [2, 0, 0, 0, 0, 0, 0, 2, 
-                             2, 2, 2, 2, 2, 2, 2, 
-                            0, 0, 2, 0, 0, 2, 0, 0, 
-                             0, 2, 2, 2, 2, 2, 0, 
-                            0, 2, 0, 0, 0, 0 ,2, 0, 
-                             2, 0, 0, 0, 0, 0, 2]),            
+    DesignElement(name = 'fireworks', cost = 1, chance_weight= 1,
+                  output = [  [24, 24],
+                            [24, 97, 24]]),    
 ]
 
 FILLS = [   # These are based on default field width and height
@@ -90,7 +86,7 @@ FILLS = [   # These are based on default field width and height
                    9, 9, 7, 7, 7, 3, 3,
                   9, 9, 7, 7, 7, 7, 3, 3,
                    9, 9, 7, 7, 7, 3, 3,
-                  9, 9, 7, 7, 7, 7, 3, 3])
+                  9, 9, 7, 7, 7, 7, 3, 3]),
 ]
 
 
