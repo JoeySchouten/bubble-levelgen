@@ -2,18 +2,25 @@ from dataclasses import dataclass
 import random
 
 #TODO:
+# whole module:
+# move consts to own file
+
+# generate_level():
 # add the ability to exclude elements or fills
 # add the ability to have design elements placed randomly
-# move consts to own file
-# add ability to set elements to use the fill option
 # add ability to take additional arguments to determine # of colors
+
+# dataclasses and _apply_*()
 # add ability to use letters as color variables in elements and fills
-# change fill/element output to Lists -> allows for double digit ints
+
+# _weighted_roll()
+# fix weighted roll quick fix
 # change weighted roll to return element again instead of index
+
+# README.md
 # add description to README
 # add functions to README
 # add string caveat to README -> can only do 0-9 as string
-# fix weighted roll quick fix
 
 @dataclass
 class DesignElement:
@@ -21,7 +28,7 @@ class DesignElement:
     name: str
     cost: int
     chance_weight: int
-    output: str
+    output: list
     treat_as_fill: bool = False
     override: bool = True
 
@@ -31,7 +38,7 @@ class Fill:
     name: str
     cost: int
     chance_weight: int
-    output: str
+    output: list
     override: bool = False
 
 @dataclass
@@ -40,21 +47,31 @@ class GeneratorConfig:
     base_difficulty: int = 10
     diff_per_level: int = 1
     diff_per_star: int = 1
-    field_width: int = 9
-    field_height: int = 8
+    field_width: int = 8
+    field_height: int = 7
 
 DESIGNS = [ # These are based on default field width and height
     DesignElement(name = 'torii', cost = 1, chance_weight = 1, treat_as_fill = True,
-                  output ='200000022222222002002000222220020000202000002'),
+                  output = [2, 0, 0, 0, 0, 0, 0, 2, 
+                             2, 2, 2, 2, 2, 2, 2, 
+                            0, 0, 2, 0, 0, 2, 0, 0, 
+                             0, 2, 2, 2, 2, 2, 0, 
+                            0, 2, 0, 0, 0, 0 ,2, 0, 
+                             2, 0, 0, 0, 0, 0, 2]),
     DesignElement(name = 'torii2', cost = 1, chance_weight = 1, treat_as_fill = True,
-                  output ='200000022222222002002000222220020000202000002')            
+                  output = [2, 0, 0, 0, 0, 0, 0, 2, 
+                             2, 2, 2, 2, 2, 2, 2, 
+                            0, 0, 2, 0, 0, 2, 0, 0, 
+                             0, 2, 2, 2, 2, 2, 0, 
+                            0, 2, 0, 0, 0, 0 ,2, 0, 
+                             2, 0, 0, 0, 0, 0, 2]),            
 ]
 
 FILLS = [   # These are based on default field width and height
     Fill(name = 'ireland', cost = 1, chance_weight = 4,
-         output ='222222'),
+         output =[2,2,2,2,2,2]),
     Fill(name = 'ireland2', cost = 1, chance_weight = 4,
-         output ='222222')
+         output =[2,2,2,2,2,2])
 ]
 
 
