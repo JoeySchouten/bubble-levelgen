@@ -22,6 +22,7 @@ class DesignElement:
     cost: int
     chance_weight: int
     output: str
+    treat_as_fill: bool = False
     override: bool = True
 
 @dataclass
@@ -43,9 +44,9 @@ class GeneratorConfig:
     field_height: int = 8
 
 DESIGNS = [ # These are based on default field width and height
-    DesignElement(name = 'torii', cost = 1, chance_weight = 1,
+    DesignElement(name = 'torii', cost = 1, chance_weight = 1, treat_as_fill = True,
                   output ='200000022222222002002000222220020000202000002'),
-    DesignElement(name = 'torii2', cost = 1, chance_weight = 1, 
+    DesignElement(name = 'torii2', cost = 1, chance_weight = 1, treat_as_fill = True,
                   output ='200000022222222002002000222220020000202000002')            
 ]
 
@@ -144,7 +145,10 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set
     while spent_difficulty < level_difficulty:
         selected_element = elements_set[_weighted_roll(elements_set)]
         spent_difficulty += selected_element.cost
-        bubble_list = _apply_element(selected_element, bubble_list)
+        if selected_element.treat_as_fill:
+            bubble_list = _apply_fill(selected_element, bubble_list)
+        else:
+            bubble_list = _apply_element(selected_element, bubble_list)
 
     # Apply the fill to our level
     bubble_list = _apply_fill(selected_fill, bubble_list)
