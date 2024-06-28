@@ -4,12 +4,10 @@ import random
 #TODO:
 # add the ability to exclude elements or fills
 # add the ability to have design elements placed randomly
-# Do not let fills/elements write zeroes
 # move consts to own file
 # add ability to set elements to use the fill option
 # add ability to take additional arguments to determine # of colors
 # add ability to use letters as color variables in elements and fills
-# change apply element to apply fill and make new function for element
 # change fill/element output to Lists -> allows for double digit ints
 # change weighted roll to return element again instead of index
 # add description to README
@@ -79,16 +77,19 @@ def _weighted_roll(elements_set):
         
     return -1 #TODO: fix this, this is a quick fix for falling out of the element sets.
 
-
 def _apply_element(element, list, config = GeneratorConfig()):
-    """Applies the output of a design element to the list of bubbles and returns the new list."""
+    list_to_return = list
+    return list_to_return
+
+def _apply_fill(fill, list, config = GeneratorConfig()):
+    """Applies the output of a fill to the list of bubbles and returns the new list."""
     list_to_return = list
 
-    for index in range(len(element.output)):
-        if element.override == True or list[index] == 0:
-            list_to_return[index] = int(element.output[index])
+    for index in range(len(fill.output)):
+        if fill.override == True or list_to_return[index] == 0:
+            if fill.output[index] != 0:
+                list_to_return[index] = int(fill.output[index])
 
-    print(len(list_to_return))
     return list_to_return
 
 
@@ -146,9 +147,11 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set
         bubble_list = _apply_element(selected_element, bubble_list)
 
     # Apply the fill to our level
-    bubble_list = _apply_element(selected_fill, bubble_list)
+    bubble_list = _apply_fill(selected_fill, bubble_list)
 
     if return_string: # Give output as one string.
         return _list_to_string(bubble_list)
     else: # Give output as 2D List.
         return _list_to_2D(bubble_list)
+
+print(generate_level(1,1))
