@@ -60,15 +60,15 @@ class GeneratorConfig:
     field_height: int = 8
 
 DESIGNS = [ # These are based on default field width and height
-    DesignElement(name = 'torii', cost = 1, chance_weight = 1, treat_as_fill = True,
+    DesignElement(name = 'torii', cost = 6, chance_weight = 1, treat_as_fill = True,
                   output = [2, 0, 0, 0, 0, 0, 0, 2, 
                              2, 2, 2, 2, 2, 2, 2, 
                             0, 0, 2, 0, 0, 2, 0, 0, 
                              0, 2, 2, 2, 2, 2, 0, 
                             0, 2, 0, 0, 0, 0 ,2, 0, 
                              2, 0, 0, 0, 0, 0, 2]),
-    DesignElement(name = 'fireworks', cost = 1, chance_weight= 1,
-                  output = [[0, 24, 24],
+    DesignElement(name = 'fireworks', cost = 3, chance_weight= 1, override = True,
+                  output = [[0, 24, 24, 0],
                              [24, 97, 24]]),    
 ]
 
@@ -115,10 +115,19 @@ def _weighted_roll(elements_set):
 def _apply_element(element, list, config = GeneratorConfig()):
     """Applies the output of an element to the list of bubbles."""
     list_to_return = list
+    is_odd_row = True
+    index = 0
 
     # Pick a random starting location on the playing field 
-    x_axis = random.randint(0, config.field_width - len(element.output[0]))
     y_axis = random.randint(0, config.field_height - len(element.output))
+    if y_axis % 2 == 0: # Get correct x_axis offset depending on which row we start on.
+        x_axis = random.randint(0, (config.field_width-1) - len(element.output[0]))
+        is_odd_row = True # We count from the top row with that row as 'row 1', so programmer's even becomes designer's odd.
+    else:
+        x_axis = random.randint(0, config.field_width - len(element.output[0]))
+        is_odd_row = False
+    
+    #TODO: set index correctly
     index = x_axis + (y_axis * config.field_width)
 
     # Apply the design, row by row.
@@ -131,7 +140,13 @@ def _apply_element(element, list, config = GeneratorConfig()):
             index += 1
         
         # Move to the next row.
-        index += (config.field_width - len(row))
+        if is_odd_row:
+            index += (config.field_width - len(row))
+            is_odd_row = False
+        else:
+            index += (config.field_width - len(row)-1)
+            is_odd_row = True
+        
 
     return list_to_return
 
