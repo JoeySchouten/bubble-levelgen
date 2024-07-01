@@ -123,9 +123,11 @@ def _apply_element(element, list, config = GeneratorConfig()):
     if y_axis % 2 == 0: # Get correct x_axis offset depending on which row we start on.
         x_axis = random.randint(0, config.field_width - len(element.output[0]))
         is_odd_row = False
+        #set starting index here
     else:
         x_axis = random.randint(0, (config.field_width-1) - len(element.output[0]))
         is_odd_row = True
+        #set starting index here
     
     #TODO: set index correctly
     index = x_axis + (y_axis * config.field_width)
@@ -226,4 +228,11 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set
     else: # Give output as 2D List.
         return _list_to_2D(bubble_list)
 
-print(generate_level(1,1))
+def test():
+    output = generate_level(1,1)
+    for row in output:
+        test_string = " ".join(map(str, row))
+        print(test_string.center(20))
+    print("Done!")
+
+test()
