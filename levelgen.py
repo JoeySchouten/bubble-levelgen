@@ -121,11 +121,11 @@ def _apply_element(element, list, config = GeneratorConfig()):
     # Pick a random starting location on the playing field 
     y_axis = random.randint(0, config.field_height - len(element.output))
     if y_axis % 2 == 0: # Get correct x_axis offset depending on which row we start on.
-        x_axis = random.randint(0, (config.field_width-1) - len(element.output[0]))
-        is_odd_row = True # We count from the top row with that row as 'row 1', so programmer's even becomes designer's odd.
-    else:
         x_axis = random.randint(0, config.field_width - len(element.output[0]))
         is_odd_row = False
+    else:
+        x_axis = random.randint(0, (config.field_width-1) - len(element.output[0]))
+        is_odd_row = True
     
     #TODO: set index correctly
     index = x_axis + (y_axis * config.field_width)
@@ -141,10 +141,10 @@ def _apply_element(element, list, config = GeneratorConfig()):
         
         # Move to the next row.
         if is_odd_row:
-            index += (config.field_width - len(row))
+            index += (config.field_width - len(row)-1)
             is_odd_row = False
         else:
-            index += (config.field_width - len(row)-1)
+            index += (config.field_width - len(row))
             is_odd_row = True
         
 
