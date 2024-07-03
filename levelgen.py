@@ -114,27 +114,27 @@ def _weighted_roll(elements_set):
     return -1 #TODO: fix this, this is a quick fix for falling out of the element sets.
 
 def _get_widest(output):
+    """Returns the length of the widest row in the output."""
     widest_row = []
     for row in output:
         if len(row) > len(widest_row):
             widest_row = row
     return len(widest_row)
 
-def _apply_element(element, list, config = GeneratorConfig()):
-    """Applies the output of an element to the list of bubbles."""
-    list_to_return = list
-    is_odd_row = True
-    index = 0
-
-    #TODO: make function apply leading zeroes
-    widest_row_width = _get_widest(element.output)
+def _get_starting_index(output, config):
+    """Picks a random legal starting location on the grid and returns the starting index and if this is on an odd/even row."""
+    starting_index = 0
+    widest_row_width = _get_widest(output)
     
     # Pick a random starting location on the playing field.
     # Make sure the entire design fits on the field height-wise.
-    y_axis = random.randint(0, config.field_height - len(element.output))
+    y_axis = random.randint(0, config.field_height - len(output))
 
-    x_start = widest_row_width - len(element.output[0]) # Makes it so that we don't cut off the element by accident.
-    if y_axis % 2 == 0: # Get correct x_axis offset depending on which row we start on.
+    # Make it so that we don't cut off the element by accident.
+    x_start = widest_row_width - len(output[0])
+
+    # Get correct x_axis offset depending on which row we start on.
+    if y_axis % 2 == 0: 
         x_axis = random.randint(x_start, config.field_width - widest_row_width)
         is_odd_row = False
     else:
@@ -144,13 +144,18 @@ def _apply_element(element, list, config = GeneratorConfig()):
     # Set starting bubble index, starting with the correct row.
     for row_nr in range(0, y_axis):
         if row_nr % 2 == 0:
-            index += config.field_width
+            starting_index += config.field_width
         else:
-            index += config.field_width-1
+            starting_index += config.field_width-1
+            
     # Now move to the correct column.
-    index += x_axis
+    starting_index += x_axis
+    return starting_index, is_odd_row
 
-    #TODO: apply leading zeroes to all rows that are shorter than longest
+def _apply_element(element, list, config = GeneratorConfig()):
+    """Applies the output of an element to the list of bubbles."""
+    list_to_return = list
+    index, is_odd_row = _get_starting_index(element.output, config)
 
     # Apply the design, row by row.
     for row in element.output:
