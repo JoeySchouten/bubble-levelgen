@@ -2,28 +2,43 @@ from dataclasses import dataclass
 import random
 
 #TODO:
-# add the ability to exclude elements or fills
-# add the ability to have design elements placed randomly
-# Do not let fills/elements write zeroes
+# whole module:
 # move consts to own file
-# add ability to set elements to use the fill option
+
+# generate_level():
+# add the ability to exclude elements or fills
 # add ability to take additional arguments to determine # of colors
+
+# dataclasses and _apply_*()
 # add ability to use letters as color variables in elements and fills
-# change apply element to apply fill and make new function for element
-# change fill/element output to Lists -> allows for double digit ints
+# make sure the function checks if there is space on the field
+
+# _weighted_roll()
+# fix weighted roll quick fix
 # change weighted roll to return element again instead of index
+
+# README.md
 # add description to README
 # add functions to README
 # add string caveat to README -> can only do 0-9 as string
-# fix weighted roll quick fix
+# change references to 9x8 field to 8x8
+# add caveat that if you use treat_as_fill on design element you need to deliver one single list
+# if not, deliver a list for each row
+# change dataclass types for output from int to list
+
+# Fills and Elements
+# add all elements and fills from level gen doc
 
 @dataclass
 class DesignElement:
-    """Level Design Element that provides a string that can be loaded onto the level arrays."""
+    """Level Design Element that provides a string that can be loaded onto the list of bubbles.
+    If treat_as_fill is True, make sure to provide an output that will run from the first bubble.
+    If not, provide the output in a 2D list with a list per row. Remember to use leading zeroes in your designs when needed."""
     name: str
     cost: int
     chance_weight: int
-    output: str
+    output: list
+    treat_as_fill: bool = False
     override: bool = True
 
 @dataclass
@@ -32,7 +47,7 @@ class Fill:
     name: str
     cost: int
     chance_weight: int
-    output: str
+    output: list
     override: bool = False
 
 @dataclass
@@ -41,21 +56,39 @@ class GeneratorConfig:
     base_difficulty: int = 10
     diff_per_level: int = 1
     diff_per_star: int = 1
-    field_width: int = 9
+    field_width: int = 8
     field_height: int = 8
 
 DESIGNS = [ # These are based on default field width and height
-    DesignElement(name = 'torii', cost = 1, chance_weight = 1,
-                  output ='200000022222222002002000222220020000202000002'),
-    DesignElement(name = 'torii2', cost = 1, chance_weight = 1, 
-                  output ='200000022222222002002000222220020000202000002')            
+    DesignElement(name = 'torii', cost = 6, chance_weight = 1, treat_as_fill = True,
+                  output = [2, 0, 0, 0, 0, 0, 0, 2, 
+                             2, 2, 2, 2, 2, 2, 2, 
+                            0, 0, 2, 0, 0, 2, 0, 0, 
+                             0, 2, 2, 2, 2, 2, 0, 
+                            0, 2, 0, 0, 0, 0 ,2, 0, 
+                             2, 0, 0, 0, 0, 0, 2]),
+    DesignElement(name = 'fireworks', cost = 3, chance_weight= 1,
+                  output = [[0, 24, 24],
+                             [24, 97, 24],]),    
 ]
 
 FILLS = [   # These are based on default field width and height
     Fill(name = 'ireland', cost = 1, chance_weight = 4,
-         output ='222222'),
+         output =[9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3]),
     Fill(name = 'ireland2', cost = 1, chance_weight = 4,
-         output ='222222')
+         output =[9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3,
+                   9, 9, 7, 7, 7, 3, 3,
+                  9, 9, 7, 7, 7, 7, 3, 3]),
 ]
 
 
@@ -79,16 +112,119 @@ def _weighted_roll(elements_set):
         
     return -1 #TODO: fix this, this is a quick fix for falling out of the element sets.
 
+def _get_widest(output):
+    """Returns the length of the widest row in the output."""
+    widest_row = []
+    for row in output:
+        if len(row) > len(widest_row):
+            widest_row = row
+    return len(widest_row)
+
+def _get_starting_index(element, config):
+    """Picks a random legal starting location on the grid and returns the starting index and if this is on an odd/even row."""
+    starting_index = 0
+    widest_row_width = _get_widest(element.output)
+    
+    # Pick a random starting location on the playing field.
+    # Make sure the entire design fits on the field height-wise.
+    y_axis = random.randint(0, config.field_height - len(element.output))
+
+    # Make it so that we don't cut off the element by accident.
+    x_start = widest_row_width - len(element.output[0])
+
+    # Get correct x_axis offset depending on which row we start on.
+    if y_axis % 2 == 0: 
+        x_axis = random.randint(x_start, config.field_width - widest_row_width)
+        is_odd_row = False
+    else:
+        x_axis = random.randint(x_start, (config.field_width-1) - widest_row_width)
+        is_odd_row = True
+    
+    # Set starting bubble index, starting with the correct row.
+    for row_nr in range(0, y_axis):
+        if row_nr % 2 == 0:
+            starting_index += config.field_width
+        else:
+            starting_index += config.field_width-1
+
+    # Now move to the correct column.
+    starting_index += x_axis
+    return starting_index, is_odd_row
+
+def _jump_row(index, row, is_odd_row, config):
+    """Skips to the next row."""
+    if is_odd_row:
+        index += (config.field_width - len(row)-1)
+        is_odd_row = False
+    else:
+        index += (config.field_width - len(row))
+        is_odd_row = True
+    return index, is_odd_row
+
+def _verify_legal_placement(element, list, config, index, is_odd_row):
+    """Makes sure the selected element can legally be placed completely in the selected area."""
+    # If the element is set to override, any placement is legal!
+    if element.override == True:
+        return True
+    else:
+        # Trawl through the list starting from the selected point
+        current_index = index
+
+        for row in element.output:
+            for bubble in row:
+                if list[index] == 0:
+                    current_index += 1
+                else:
+                    return False
+            
+        index, is_odd_row = _jump_row(current_index, row, is_odd_row, config)
+        
+        # No issues found!
+        return True
 
 def _apply_element(element, list, config = GeneratorConfig()):
-    """Applies the output of a design element to the list of bubbles and returns the new list."""
+    """Applies the output of an element to the list of bubbles."""
+    list_to_return = list
+    index = 0
+    is_odd_row = True
+    attempts = 0
+    is_legal = False
+
+    # Try to find a starting location a few times before giving up.
+    while not is_legal:
+        # If we have tried too often, just give up.
+        if attempts > 5:
+            return list_to_return
+        # Otherwise, pick a starting location and see if we're allowed to place there.
+        else:
+            index, is_odd_row = _get_starting_index(element, config)
+            is_legal = _verify_legal_placement(element, list, config, index, is_odd_row)
+
+        attempts +=1
+    
+    # Apply the design, row by row.
+    for row in element.output:
+        for bubble in row:
+
+            if element.override == True or list_to_return[index] == 0:
+                if bubble != 0:
+                    list_to_return[index] = bubble
+            index += 1
+        
+        # Move to the next row.
+        index, is_odd_row = _jump_row(index, row, is_odd_row, config)
+        
+    return list_to_return
+
+def _apply_fill(fill, list, config = GeneratorConfig()):
+    """Applies the output of a fill to the list of bubbles and returns the new list."""
     list_to_return = list
 
-    for index in range(len(element.output)):
-        if element.override == True or list[index] == 0:
-            list_to_return[index] = int(element.output[index])
+    for index in range(len(fill.output)):
+        if fill.override == True or list_to_return[index] == 0:
+            if fill.output[index] != 0:
+                list_to_return[index] = int(fill.output[index])
 
-    print(len(list_to_return))
     return list_to_return
 
 
@@ -143,12 +279,24 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set
     while spent_difficulty < level_difficulty:
         selected_element = elements_set[_weighted_roll(elements_set)]
         spent_difficulty += selected_element.cost
-        bubble_list = _apply_element(selected_element, bubble_list)
+        if selected_element.treat_as_fill:
+            bubble_list = _apply_fill(selected_element, bubble_list, config)
+        else:
+            bubble_list = _apply_element(selected_element, bubble_list, config)
 
     # Apply the fill to our level
-    bubble_list = _apply_element(selected_fill, bubble_list)
+    bubble_list = _apply_fill(selected_fill, bubble_list, config)
 
     if return_string: # Give output as one string.
         return _list_to_string(bubble_list)
     else: # Give output as 2D List.
         return _list_to_2D(bubble_list)
+
+def test():
+    output = generate_level(1,1)
+    for row in output:
+        test_string = " ".join(map(str, row))
+        print(test_string.center(20))
+    print("Done!")
+
+test()
