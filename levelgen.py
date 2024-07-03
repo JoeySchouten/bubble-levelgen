@@ -12,6 +12,7 @@ import random
 # dataclasses and _apply_*()
 # add ability to use letters as color variables in elements and fills
 # make sure the function checks if there is space on the field
+# >>>make function apply leading zeroes
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -112,19 +113,30 @@ def _weighted_roll(elements_set):
         
     return -1 #TODO: fix this, this is a quick fix for falling out of the element sets.
 
+def _get_widest(output):
+    widest_row = []
+    for row in output:
+        if len(row) > len(widest_row):
+            widest_row = row
+    return len(widest_row)
+
 def _apply_element(element, list, config = GeneratorConfig()):
     """Applies the output of an element to the list of bubbles."""
     list_to_return = list
     is_odd_row = True
     index = 0
 
+    #TODO: make function apply leading zeroes
+    widest_row_width = _get_widest(element.output)
+    
+    #TODO: make element.output[0] be the widest row
     # Pick a random starting location on the playing field 
     y_axis = random.randint(0, config.field_height - len(element.output))
     if y_axis % 2 == 0: # Get correct x_axis offset depending on which row we start on.
-        x_axis = random.randint(0, config.field_width - len(element.output[0]))
+        x_axis = random.randint(0, config.field_width - widest_row_width)
         is_odd_row = False
     else:
-        x_axis = random.randint(0, (config.field_width-1) - len(element.output[0]))
+        x_axis = random.randint(0, (config.field_width-1) - widest_row_width)
         is_odd_row = True
     
     # Set starting bubble index, starting with the correct row.
@@ -135,6 +147,8 @@ def _apply_element(element, list, config = GeneratorConfig()):
             index += config.field_width-1
     # Now move to the correct column.
     index += x_axis
+
+    #TODO: apply leading zeroes to all rows that are shorter than longest
 
     # Apply the design, row by row.
     for row in element.output:
