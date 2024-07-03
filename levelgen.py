@@ -129,14 +129,16 @@ def _apply_element(element, list, config = GeneratorConfig()):
     #TODO: make function apply leading zeroes
     widest_row_width = _get_widest(element.output)
     
-    #TODO: make element.output[0] be the widest row
-    # Pick a random starting location on the playing field 
+    # Pick a random starting location on the playing field.
+    # Make sure the entire design fits on the field height-wise.
     y_axis = random.randint(0, config.field_height - len(element.output))
+
+    x_start = widest_row_width - len(element.output[0]) # Makes it so that we don't cut off the element by accident.
     if y_axis % 2 == 0: # Get correct x_axis offset depending on which row we start on.
-        x_axis = random.randint(0, config.field_width - widest_row_width)
+        x_axis = random.randint(x_start, config.field_width - widest_row_width)
         is_odd_row = False
     else:
-        x_axis = random.randint(0, (config.field_width-1) - widest_row_width)
+        x_axis = random.randint(x_start, (config.field_width-1) - widest_row_width)
         is_odd_row = True
     
     # Set starting bubble index, starting with the correct row.
