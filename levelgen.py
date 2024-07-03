@@ -12,7 +12,6 @@ import random
 # dataclasses and _apply_*()
 # add ability to use letters as color variables in elements and fills
 # make sure the function checks if there is space on the field
-# >>>make function apply leading zeroes
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -68,9 +67,9 @@ DESIGNS = [ # These are based on default field width and height
                              0, 2, 2, 2, 2, 2, 0, 
                             0, 2, 0, 0, 0, 0 ,2, 0, 
                              2, 0, 0, 0, 0, 0, 2]),
-    DesignElement(name = 'fireworks', cost = 3, chance_weight= 1, override = True,
-                  output = [[0, 24, 24, 0],
-                             [24, 97, 24]]),    
+    DesignElement(name = 'fireworks', cost = 3, chance_weight= 1,
+                  output = [[0, 24, 24],
+                             [24, 97, 24],]),    
 ]
 
 FILLS = [   # These are based on default field width and height
@@ -121,17 +120,17 @@ def _get_widest(output):
             widest_row = row
     return len(widest_row)
 
-def _get_starting_index(output, config):
+def _get_starting_index(element, config):
     """Picks a random legal starting location on the grid and returns the starting index and if this is on an odd/even row."""
     starting_index = 0
-    widest_row_width = _get_widest(output)
+    widest_row_width = _get_widest(element.output)
     
     # Pick a random starting location on the playing field.
     # Make sure the entire design fits on the field height-wise.
-    y_axis = random.randint(0, config.field_height - len(output))
+    y_axis = random.randint(0, config.field_height - len(element.output))
 
     # Make it so that we don't cut off the element by accident.
-    x_start = widest_row_width - len(output[0])
+    x_start = widest_row_width - len(element.output[0])
 
     # Get correct x_axis offset depending on which row we start on.
     if y_axis % 2 == 0: 
@@ -147,16 +146,62 @@ def _get_starting_index(output, config):
             starting_index += config.field_width
         else:
             starting_index += config.field_width-1
-            
+
     # Now move to the correct column.
     starting_index += x_axis
     return starting_index, is_odd_row
 
+def _jump_row(index, row, is_odd_row, config):
+    """Skips to the next row."""
+    if is_odd_row:
+        index += (config.field_width - len(row)-1)
+        is_odd_row = False
+    else:
+        index += (config.field_width - len(row))
+        is_odd_row = True
+    return index, is_odd_row
+
+def _verify_legal_placement(element, list, config, index, is_odd_row):
+    """Makes sure the selected element can legally be placed completely in the selected area."""
+    # If the element is set to override, any placement is legal!
+    if element.override == True:
+        return True
+    else:
+        # Trawl through the list starting from the selected point
+        current_index = index
+
+        for row in element.output:
+            for bubble in row:
+                if list[index] == 0:
+                    current_index += 1
+                else:
+                    return False
+            
+        index, is_odd_row = _jump_row(current_index, row, is_odd_row, config)
+        
+        # No issues found!
+        return True
+
 def _apply_element(element, list, config = GeneratorConfig()):
     """Applies the output of an element to the list of bubbles."""
     list_to_return = list
-    index, is_odd_row = _get_starting_index(element.output, config)
+    index = 0
+    is_odd_row = True
+    attempts = 0
+    is_legal = False
 
+    # Try to find a starting location a few times before giving up.
+    while not is_legal:
+        # If we have tried too often, just give up.
+        if attempts > 5:
+            return list_to_return
+        # Otherwise, pick a starting location and see if we're allowed to place there.
+        else:
+            index, is_odd_row = _get_starting_index(element, config)
+            is_legal = _verify_legal_placement(element, list, config, index, is_odd_row)
+
+        attempts +=1
+    
     # Apply the design, row by row.
     for row in element.output:
         for bubble in row:
@@ -167,12 +212,7 @@ def _apply_element(element, list, config = GeneratorConfig()):
             index += 1
         
         # Move to the next row.
-        if is_odd_row:
-            index += (config.field_width - len(row)-1)
-            is_odd_row = False
-        else:
-            index += (config.field_width - len(row))
-            is_odd_row = True
+        index, is_odd_row = _jump_row(index, row, is_odd_row, config)
         
     return list_to_return
 
