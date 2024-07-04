@@ -5,12 +5,13 @@ from consts import DESIGNS, FILLS
 
 #TODO:
 # generate_level():
-# add the ability to exclude elements or fills
+# add the ability to exclude or force elements or fills - names/keywords    PRIO_1
 # add ability to take additional arguments to determine # of colors
 
 # dataclasses and _apply_*()
-# add ability to use letters as color variables in elements and fills
-# make sure the function checks if there is space on the field
+# add ability to use letters as color variables in elements and fills       PRIO_2
+# add ability to set colors for these -> if none just random
+# add min/max start row position                                            PRIO_3
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -25,8 +26,8 @@ from consts import DESIGNS, FILLS
 # if not, deliver a list for each row
 # change dataclass types for output from int to list
 
-# Fills and Elements
-# add all elements and fills from level gen doc
+# Balancing
+# Adjust numbers on everything
 
 @dataclass
 class DesignElement:
