@@ -224,6 +224,18 @@ def _list_to_string(list):
     
     return string_to_return
 
+def _filter_list(excludes, list):
+    """Filters a list based on provided keywords or names and returns the list without those matches."""
+    filtered_list = []
+    for entry in list:
+        if entry.name not in excludes:
+            add_to_list = True
+            for keyword in entry.keywords:
+                if keyword in excludes:
+                    add_to_list = False
+            if add_to_list:
+                filtered_list.append(entry)
+    return filtered_list
 
 def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], elements_set=DESIGNS, fill_set=FILLS, return_string=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
@@ -241,27 +253,19 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         else:
             bubble_list += ([0] * (config.field_width-1))
 
-    # Pick a random fill, save it for later, and add the cost to what we have spent.
-    #TODO: check if required name is in set, if so put it in selected fill
-    #   if found, we move straight to
-    # if not, check fill set and filter out any excludes
-    #   then roll on this new set
+    # Select a fill either based on a pre-defined name or from the constant, filtered or not.
     fills_to_roll = []
     selected_fill = None
 
+    # See if we have a fill defined; We can only use one fill, so we stop as soon as we find one pre-defined.
     for fill in fill_set:
         if fill.name in required:
             selected_fill = fill
             break
-        elif fill.name not in excludes:
-            add_to_list = True
-            for keyword in fill.keywords:
-                if keyword in excludes:
-                    add_to_list = False
-            if add_to_list:
-                fills_to_roll.append(fill)
     
+    # If we have no pre-defined fills, filter the list of fills using the excluding keywords, and roll on the result.
     if selected_fill is None:
+        fills_to_roll = _filter_list(excludes, fill_set)
         selected_fill = fills_to_roll[_weighted_roll(fills_to_roll)]
     spent_difficulty += selected_fill.cost
 
