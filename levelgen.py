@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from consts import DESIGNS, FILLS
 
-from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, _list_to_string, _weighted_roll
+from helpers import _apply_element, _apply_fill, _color_swap, _filter_list, _list_to_2D, _list_to_string, _weighted_roll
 
 #TODO:
 # generate_level():
@@ -103,10 +103,11 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         return _list_to_2D(bubble_list, config)
 
 def test():
-    output = generate_level(1,1, required=['netherlands'], only_required=True)
+    output = generate_level(1,1, required=['diagonalR2'], only_required=True)
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))
     print("Done!")
 
-test()
+#test()
+print(_color_swap(FILLS[9]))

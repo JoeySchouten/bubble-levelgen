@@ -1,5 +1,9 @@
 import random
 
+#TODO:
+# make a find colors function that returns what colors(ints) are used
+# make a 'make color dict' function that is called in the color swap function
+
 def _apply_element(element, list, config):
     """Applies the output of an element to the list of bubbles."""
     list_to_return = list
@@ -43,6 +47,19 @@ def _apply_fill(fill, list, config):
             if fill.output[index] != 0:
                 list_to_return[index] = int(fill.output[index])
 
+    return list_to_return
+
+def _color_swap(element):
+    """Swaps string color variables to integers."""
+    list_to_return = []
+    #TODO: create color dict function
+    color_dict = {'A': 1, 'B': 2, 'C': 3, 'D': 4}
+    # Translate the string variables to given integers from the dict; if not a string, we just put in the integer present.
+    for entry in element.output:
+        if entry in color_dict:
+            list_to_return.append(color_dict[entry])
+        else:
+            list_to_return.append(entry)
     return list_to_return
 
 def _filter_list(excludes, list):
