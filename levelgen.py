@@ -269,9 +269,23 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         selected_fill = fills_to_roll[_weighted_roll(fills_to_roll)]
     spent_difficulty += selected_fill.cost
 
+    # Take the required names and queue all elements that are predefined, then apply them.
+    queued_elements = []
+    for element in elements_set:
+        if element.name in required:
+            queued_elements.append(element)
+    
+    for element in queued_elements:
+        spent_difficulty += element.cost
+        if element.treat_as_fill:
+            bubble_list = _apply_fill(element, bubble_list, config)
+        else:
+            bubble_list = _apply_element(element, bubble_list, config)
+
     # Roll design elements, apply them, and add the cost to what we have spent.
+    elements_to_roll = _filter_list(excludes, elements_set)
     while spent_difficulty < level_difficulty:
-        selected_element = elements_set[_weighted_roll(elements_set)]
+        selected_element = elements_to_roll[_weighted_roll(elements_to_roll)]
         spent_difficulty += selected_element.cost
         if selected_element.treat_as_fill:
             bubble_list = _apply_fill(selected_element, bubble_list, config)
