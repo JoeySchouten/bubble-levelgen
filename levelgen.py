@@ -1,17 +1,17 @@
 from dataclasses import dataclass
 import random
 
-#TODO:
-# whole module:
-# move consts to own file
+from consts import DESIGNS, FILLS
 
+#TODO:
 # generate_level():
-# add the ability to exclude elements or fills
+# add the ability to exclude or force elements or fills - names/keywords    PRIO_1
 # add ability to take additional arguments to determine # of colors
 
 # dataclasses and _apply_*()
-# add ability to use letters as color variables in elements and fills
-# make sure the function checks if there is space on the field
+# add ability to use letters as color variables in elements and fills       PRIO_2
+# add ability to set colors for these -> if none just random
+# add min/max start row position                                            PRIO_3
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -26,8 +26,8 @@ import random
 # if not, deliver a list for each row
 # change dataclass types for output from int to list
 
-# Fills and Elements
-# add all elements and fills from level gen doc
+# Balancing
+# Adjust numbers on everything
 
 @dataclass
 class DesignElement:
@@ -58,39 +58,6 @@ class GeneratorConfig:
     diff_per_star: int = 1
     field_width: int = 8
     field_height: int = 8
-
-DESIGNS = [ # These are based on default field width and height
-    DesignElement(name = 'torii', cost = 6, chance_weight = 1, treat_as_fill = True,
-                  output = [2, 0, 0, 0, 0, 0, 0, 2, 
-                             2, 2, 2, 2, 2, 2, 2, 
-                            0, 0, 2, 0, 0, 2, 0, 0, 
-                             0, 2, 2, 2, 2, 2, 0, 
-                            0, 2, 0, 0, 0, 0 ,2, 0, 
-                             2, 0, 0, 0, 0, 0, 2]),
-    DesignElement(name = 'fireworks', cost = 3, chance_weight= 1,
-                  output = [[0, 24, 24],
-                             [24, 97, 24],]),    
-]
-
-FILLS = [   # These are based on default field width and height
-    Fill(name = 'ireland', cost = 1, chance_weight = 4,
-         output =[9, 9, 7, 7, 7, 7, 3, 3,
-                   9, 9, 7, 7, 7, 3, 3,
-                  9, 9, 7, 7, 7, 7, 3, 3,
-                   9, 9, 7, 7, 7, 3, 3,
-                  9, 9, 7, 7, 7, 7, 3, 3,
-                   9, 9, 7, 7, 7, 3, 3,
-                  9, 9, 7, 7, 7, 7, 3, 3]),
-    Fill(name = 'ireland2', cost = 1, chance_weight = 4,
-         output =[9, 9, 7, 7, 7, 7, 3, 3,
-                   9, 9, 7, 7, 7, 3, 3,
-                  9, 9, 7, 7, 7, 7, 3, 3,
-                   9, 9, 7, 7, 7, 3, 3,
-                  9, 9, 7, 7, 7, 7, 3, 3,
-                   9, 9, 7, 7, 7, 3, 3,
-                  9, 9, 7, 7, 7, 7, 3, 3]),
-]
-
 
 def _weighted_roll(elements_set):
     """Return a random index from a list with items with weighted chances"""
