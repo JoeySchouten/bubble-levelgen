@@ -8,7 +8,6 @@ from consts import DESIGNS, FILLS
 # move all helper functions to their own script?
 
 # generate_level():
-# add the ability to exclude or force elements or fills - names/keywords    PRIO_1
 # add ability to take additional arguments to determine # of colors
 
 # dataclasses and _apply_*()
@@ -237,7 +236,7 @@ def _filter_list(excludes, list):
                 filtered_list.append(entry)
     return filtered_list
 
-def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], elements_set=DESIGNS, fill_set=FILLS, return_string=False):
+def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], elements_set=DESIGNS, fill_set=FILLS, return_string=False, only_required=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
     based on entered config parameters, element and fill arrays."""
 
@@ -284,7 +283,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
 
     # Roll design elements, apply them, and add the cost to what we have spent.
     elements_to_roll = _filter_list(excludes, elements_set)
-    while spent_difficulty < level_difficulty:
+    while spent_difficulty < level_difficulty and not only_required:
         selected_element = elements_to_roll[_weighted_roll(elements_to_roll)]
         spent_difficulty += selected_element.cost
         if selected_element.treat_as_fill:
@@ -301,7 +300,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         return _list_to_2D(bubble_list)
 
 def test():
-    output = generate_level(1,1, excludes=['flag'])
+    output = generate_level(1,1, required=['netherlands'], only_required=True)
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))
