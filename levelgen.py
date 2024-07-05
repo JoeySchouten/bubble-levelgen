@@ -9,9 +9,9 @@ from helpers import _apply_element, _apply_fill, _color_swap, _filter_list, _lis
 # add ability to take additional arguments to determine # of colors
 
 # dataclasses and _apply_*()
-# add ability to use letters as color variables in elements and fills       PRIO_2
 # add ability to set colors for these -> if none just random
 # add min/max start row position                                            PRIO_3
+# fix all fills with letter variables
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -109,5 +109,4 @@ def test():
         print(test_string.center(20))
     print("Done!")
 
-#test()
-print(_color_swap(FILLS[9]))
+test()
