@@ -8,9 +8,9 @@ class DesignElement:
     name: str
     cost: int
     chance_weight: int
+    keywords: list
     output: list
     treat_as_fill: bool = False
-    keywords = []
     override: bool = True
 
 @dataclass
@@ -20,7 +20,7 @@ class Fill:
     cost: int
     chance_weight: int
     output: list
-    keywords = []
+    keywords: list
     override: bool = False
 
 

@@ -4,8 +4,10 @@ import random
 from consts import DESIGNS, FILLS
 
 #TODO:
+# whole module
+# move all helper functions to their own script?
+
 # generate_level():
-# add the ability to exclude or force elements or fills - names/keywords    PRIO_1
 # add ability to take additional arguments to determine # of colors
 
 # dataclasses and _apply_*()
@@ -221,8 +223,20 @@ def _list_to_string(list):
     
     return string_to_return
 
+def _filter_list(excludes, list):
+    """Filters a list based on provided keywords or names and returns the list without those matches."""
+    filtered_list = []
+    for entry in list:
+        if entry.name not in excludes:
+            add_to_list = True
+            for keyword in entry.keywords:
+                if keyword in excludes:
+                    add_to_list = False
+            if add_to_list:
+                filtered_list.append(entry)
+    return filtered_list
 
-def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set=DESIGNS, fill_set=FILLS, return_string=False):
+def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], elements_set=DESIGNS, fill_set=FILLS, return_string=False, only_required=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
     based on entered config parameters, element and fill arrays."""
 
@@ -238,13 +252,39 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set
         else:
             bubble_list += ([0] * (config.field_width-1))
 
-    # Pick a random fill, save it for later, and add the cost to what we have spent.
-    selected_fill = fill_set[_weighted_roll(fill_set)]
+    # Select a fill either based on a pre-defined name or from the constant, filtered or not.
+    fills_to_roll = []
+    selected_fill = None
+
+    # See if we have a fill defined; We can only use one fill, so we stop as soon as we find one pre-defined.
+    for fill in fill_set:
+        if fill.name in required:
+            selected_fill = fill
+            break
+    
+    # If we have no pre-defined fills, filter the list of fills using the excluding keywords, and roll on the result.
+    if selected_fill is None:
+        fills_to_roll = _filter_list(excludes, fill_set)
+        selected_fill = fills_to_roll[_weighted_roll(fills_to_roll)]
     spent_difficulty += selected_fill.cost
 
+    # Take the required names and queue all elements that are predefined, then apply them.
+    queued_elements = []
+    for element in elements_set:
+        if element.name in required:
+            queued_elements.append(element)
+    
+    for element in queued_elements:
+        spent_difficulty += element.cost
+        if element.treat_as_fill:
+            bubble_list = _apply_fill(element, bubble_list, config)
+        else:
+            bubble_list = _apply_element(element, bubble_list, config)
+
     # Roll design elements, apply them, and add the cost to what we have spent.
-    while spent_difficulty < level_difficulty:
-        selected_element = elements_set[_weighted_roll(elements_set)]
+    elements_to_roll = _filter_list(excludes, elements_set)
+    while spent_difficulty < level_difficulty and not only_required:
+        selected_element = elements_to_roll[_weighted_roll(elements_to_roll)]
         spent_difficulty += selected_element.cost
         if selected_element.treat_as_fill:
             bubble_list = _apply_fill(selected_element, bubble_list, config)
@@ -260,7 +300,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set
         return _list_to_2D(bubble_list)
 
 def test():
-    output = generate_level(1,1)
+    output = generate_level(1,1, required=['netherlands'], only_required=True)
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))
