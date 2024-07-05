@@ -4,6 +4,9 @@ import random
 from consts import DESIGNS, FILLS
 
 #TODO:
+# whole module
+# move all helper functions to their own script?
+
 # generate_level():
 # add the ability to exclude or force elements or fills - names/keywords    PRIO_1
 # add ability to take additional arguments to determine # of colors
@@ -222,7 +225,7 @@ def _list_to_string(list):
     return string_to_return
 
 
-def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set=DESIGNS, fill_set=FILLS, return_string=False):
+def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], elements_set=DESIGNS, fill_set=FILLS, return_string=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
     based on entered config parameters, element and fill arrays."""
 
@@ -239,7 +242,27 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set
             bubble_list += ([0] * (config.field_width-1))
 
     # Pick a random fill, save it for later, and add the cost to what we have spent.
-    selected_fill = fill_set[_weighted_roll(fill_set)]
+    #TODO: check if required name is in set, if so put it in selected fill
+    #   if found, we move straight to
+    # if not, check fill set and filter out any excludes
+    #   then roll on this new set
+    fills_to_roll = []
+    selected_fill = None
+
+    for fill in fill_set:
+        if fill.name in required:
+            selected_fill = fill
+            break
+        elif fill.name not in excludes:
+            add_to_list = True
+            for keyword in fill.keywords:
+                if keyword in excludes:
+                    add_to_list = False
+            if add_to_list:
+                fills_to_roll.append(fill)
+    
+    if selected_fill is None:
+        selected_fill = fills_to_roll[_weighted_roll(fills_to_roll)]
     spent_difficulty += selected_fill.cost
 
     # Roll design elements, apply them, and add the cost to what we have spent.
@@ -260,7 +283,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set
         return _list_to_2D(bubble_list)
 
 def test():
-    output = generate_level(1,1)
+    output = generate_level(1,1, excludes=['flag'])
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))
