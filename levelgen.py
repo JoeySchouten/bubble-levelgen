@@ -76,6 +76,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
     for element in elements_set:
         if element.name in required:
             queued_elements.append(element)
+            print('queued ' + element.name)
     
     for element in queued_elements:
         spent_difficulty += element.cost
@@ -83,6 +84,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
             bubble_list = _apply_fill(element, bubble_list, config)
         else:
             bubble_list = _apply_element(element, bubble_list, config)
+            print('applied element')
 
     # Roll design elements, apply them, and add the cost to what we have spent.
     elements_to_roll = _filter_list(excludes, elements_set)
@@ -103,7 +105,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         return _list_to_2D(bubble_list, config)
 
 def test():
-    output = generate_level(1,1, required=['diagonalR2'], only_required=True)
+    output = generate_level(1,1, required=['diagonalR2', 'fireworks'], only_required=True)
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))

@@ -102,14 +102,18 @@ def _get_starting_index(element, config):
     
     # Pick a random starting location on the playing field.
     # Make sure the entire design fits on the field height-wise.
-    y_axis = random.randint(0, config.field_height - len(element.output))
+    y_axis = 0
+    if element.y_max is not 0:
+        y_axis = random.randint(element.y_min, element.y_max)
+    else:
+        y_axis = random.randint(element.y_min, config.field_height - len(element.output))
 
     # Make it so that we don't cut off the element by accident.
     x_start = widest_row_width - len(element.output[0])
 
     # Get correct x_axis offset depending on which row we start on.
     if y_axis % 2 == 0: 
-        x_axis = random.randint(x_start, config.field_width - widest_row_width)
+        x_axis = random.randint(x_start, config.field_width - (widest_row_width+1)) # Adding the 1 means it doesn't accidentally cut off the next row.
         is_odd_row = False
     else:
         x_axis = random.randint(x_start, (config.field_width-1) - widest_row_width)
