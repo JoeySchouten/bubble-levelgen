@@ -37,13 +37,50 @@ def _apply_element(element, list, config):
 def _apply_fill(fill, list, config):
     """Applies the output of a fill to the list of bubbles and returns the new list."""
     list_to_return = list
+    fill_to_apply = _color_swap(fill, _filter_colors(list, 4))
 
-    for index in range(len(fill.output)):
+    # Overwrite any empty spaces with the fill or just overwrite anything with override=True.
+    for index in range(len(fill_to_apply)):
         if fill.override == True or list_to_return[index] == 0:
-            if fill.output[index] != 0:
-                list_to_return[index] = int(fill.output[index])
+            if fill_to_apply[index] != 0:
+                list_to_return[index] = int(fill_to_apply[index])
 
     return list_to_return
+
+def _color_swap(element, color_list):
+    """Swaps string color variables to integers."""
+    list_to_return = []
+    color_dict = {}
+
+    # Translate the string variables to given integers from the dict; if not a string, we just put in the integer present.
+    for entry in element.output:
+        # Check if the entry is a string, and if so, add it as a key to the dict.
+        if isinstance(entry, str):
+            if entry not in color_dict:
+                color_dict[entry] = color_list.pop(random.randint(0, len(color_list)-1))
+
+        if entry in color_dict:
+            list_to_return.append(color_dict[entry])
+        else:
+            list_to_return.append(entry)
+    return list_to_return
+
+def _filter_colors(bubble_list, min_colors):
+    """Takes the range of basic color ints and removes the ones in use. Will then pad the range with random ints if there would not be enough colors in the list."""
+    colors_to_return = []
+    for number in range(1,10):
+        colors_to_return.append(number)
+    
+    # filter out all of the used integers
+    for bubble in bubble_list:
+        if bubble in colors_to_return:
+            colors_to_return.remove(bubble)
+    
+    # if we now do not have enough integers to draw up to 4 colors, append a random one until we do.
+    while len(colors_to_return) < min_colors:
+        colors_to_return.append(random.randint(1,9))
+
+    return colors_to_return
 
 def _filter_list(excludes, list):
     """Filters a list based on provided keywords or names and returns the list without those matches."""

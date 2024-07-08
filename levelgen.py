@@ -2,16 +2,16 @@ from dataclasses import dataclass
 
 from consts import DESIGNS, FILLS
 
-from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, _list_to_string, _weighted_roll
+from helpers import _apply_element, _apply_fill, _color_swap, _filter_list, _list_to_2D, _list_to_string, _weighted_roll
 
 #TODO:
 # generate_level():
 # add ability to take additional arguments to determine # of colors
 
 # dataclasses and _apply_*()
-# add ability to use letters as color variables in elements and fills       PRIO_2
 # add ability to set colors for these -> if none just random
 # add min/max start row position                                            PRIO_3
+# fix all fills with letter variables
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -103,7 +103,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         return _list_to_2D(bubble_list, config)
 
 def test():
-    output = generate_level(1,1, required=['netherlands'], only_required=True)
+    output = generate_level(1,1, required=['diagonalR2'], only_required=True)
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))
