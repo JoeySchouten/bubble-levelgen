@@ -10,8 +10,9 @@ from helpers import _apply_element, _apply_fill, _color_swap, _filter_list, _lis
 
 # dataclasses and _apply_*()
 # add ability to set colors for these -> if none just random
-# add min/max start row position                                            PRIO_3
-# fix all fills with letter variables
+
+# _filter_colors:
+# make it look into output that is not fills -> isinstance(output[0], list)?
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -92,12 +93,12 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         selected_element = elements_to_roll[_weighted_roll(elements_to_roll)]
         spent_difficulty += selected_element.cost
         if selected_element.treat_as_fill:
-            bubble_list = _apply_fill(selected_element, bubble_list, config)
+            bubble_list = _apply_fill(selected_element, bubble_list, excludes, config)
         else:
             bubble_list = _apply_element(selected_element, bubble_list, config)
 
     # Apply the fill to our level
-    bubble_list = _apply_fill(selected_fill, bubble_list, config)
+    bubble_list = _apply_fill(selected_fill, bubble_list, excludes, config)
 
     if return_string: # Give output as one string.
         return _list_to_string(bubble_list)
@@ -105,7 +106,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         return _list_to_2D(bubble_list, config)
 
 def test():
-    output = generate_level(1,1, required=['diagonalR2', 'fireworks'], only_required=True)
+    output = generate_level(1,1, excludes=[7])
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))

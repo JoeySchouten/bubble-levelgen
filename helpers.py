@@ -34,10 +34,10 @@ def _apply_element(element, list, config):
         
     return list_to_return
 
-def _apply_fill(fill, list, config):
+def _apply_fill(fill, list, excludes, config):
     """Applies the output of a fill to the list of bubbles and returns the new list."""
     list_to_return = list
-    fill_to_apply = _color_swap(fill, _filter_colors(list, 4))
+    fill_to_apply = _color_swap(fill, _filter_colors(list, 4, excludes))
 
     # Overwrite any empty spaces with the fill or just overwrite anything with override=True.
     for index in range(len(fill_to_apply)):
@@ -65,16 +65,21 @@ def _color_swap(element, color_list):
             list_to_return.append(entry)
     return list_to_return
 
-def _filter_colors(bubble_list, min_colors):
+def _filter_colors(bubble_list, min_colors, excludes):
     """Takes the range of basic color ints and removes the ones in use. Will then pad the range with random ints if there would not be enough colors in the list."""
     colors_to_return = []
     for number in range(1,10):
         colors_to_return.append(number)
     
-    # filter out all of the used integers
+    # Filter out all of the used integers
     for bubble in bubble_list:
         if bubble in colors_to_return:
             colors_to_return.remove(bubble)
+    
+    # Filter out all excluded integers
+    for entry in excludes:
+        if entry in colors_to_return:
+            colors_to_return.remove(entry)
     
     # if we now do not have enough integers to draw up to 4 colors, append a random one until we do.
     while len(colors_to_return) < min_colors:
@@ -86,13 +91,26 @@ def _filter_list(excludes, list):
     """Filters a list based on provided keywords or names and returns the list without those matches."""
     filtered_list = []
     for entry in list:
+        add_to_list = True
+
+        # Filter based on name or keywords.
         if entry.name not in excludes:
-            add_to_list = True
             for keyword in entry.keywords:
                 if keyword in excludes:
                     add_to_list = False
-            if add_to_list:
+        else:
+            add_to_list = False
+        
+        # Filter based on color integers.
+        for bubble in entry.output:
+            if bubble in excludes:
+                add_to_list = False
+
+        if add_to_list:
                 filtered_list.append(entry)
+        else:
+            print('excluded ' + entry.name)
+
     return filtered_list
 
 def _get_starting_index(element, config):
@@ -103,7 +121,7 @@ def _get_starting_index(element, config):
     # Pick a random starting location on the playing field.
     # Make sure the entire design fits on the field height-wise.
     y_axis = 0
-    if element.y_max is not 0:
+    if element.y_max != 0:
         y_axis = random.randint(element.y_min, element.y_max)
     else:
         y_axis = random.randint(element.y_min, config.field_height - len(element.output))
