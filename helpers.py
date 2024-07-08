@@ -87,10 +87,10 @@ def _filter_colors(bubble_list, min_colors, excludes):
 
     return colors_to_return
 
-def _filter_list(excludes, list):
+def _filter_list(excludes, list_to_filter):
     """Filters a list based on provided keywords or names and returns the list without those matches."""
     filtered_list = []
-    for entry in list:
+    for entry in list_to_filter:
         add_to_list = True
 
         # Filter based on name or keywords.
@@ -102,14 +102,18 @@ def _filter_list(excludes, list):
             add_to_list = False
         
         # Filter based on color integers.
-        for bubble in entry.output:
-            if bubble in excludes:
-                add_to_list = False
+        if isinstance(entry.output[0], list): # This is a multi-list output like Design Elements.
+            for row in entry.output:
+                for bubble in row:
+                    if bubble in excludes:
+                        add_to_list = False
+        else: # This is a Fill or a Design Element treated as Fill.
+            for bubble in entry.output:
+                if bubble in excludes:
+                    add_to_list = False
 
         if add_to_list:
                 filtered_list.append(entry)
-        else:
-            print('excluded ' + entry.name)
 
     return filtered_list
 
