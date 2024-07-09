@@ -2,16 +2,12 @@ from dataclasses import dataclass
 
 from consts import DESIGNS, FILLS
 
-from helpers import _apply_element, _apply_fill, _color_swap, _filter_list, _list_to_2D, _list_to_string, _weighted_roll
+from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, _list_to_string, _weighted_roll
 
 #TODO:
 # generate_level():
 # add ability to take additional arguments to determine # of colors
-
-# dataclasses and _apply_*()
-# add ability to set colors for these -> if none just random
-# add min/max start row position                                            PRIO_3
-# fix all fills with letter variables
+# add ability to use letter colors for non-fill design elements
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -39,7 +35,9 @@ class GeneratorConfig:
     field_height: int = 8
 
 
-def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], elements_set=DESIGNS, fill_set=FILLS, return_string=False, only_required=False):
+def generate_level(
+            world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], 
+            elements_set=DESIGNS, fill_set=FILLS, return_string=False, only_required=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
     based on entered config parameters, element and fill arrays."""
 
@@ -76,6 +74,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
     for element in elements_set:
         if element.name in required:
             queued_elements.append(element)
+            print('queued ' + element.name)
     
     for element in queued_elements:
         spent_difficulty += element.cost
@@ -83,6 +82,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
             bubble_list = _apply_fill(element, bubble_list, config)
         else:
             bubble_list = _apply_element(element, bubble_list, config)
+            print('applied element')
 
     # Roll design elements, apply them, and add the cost to what we have spent.
     elements_to_roll = _filter_list(excludes, elements_set)
@@ -90,12 +90,12 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         selected_element = elements_to_roll[_weighted_roll(elements_to_roll)]
         spent_difficulty += selected_element.cost
         if selected_element.treat_as_fill:
-            bubble_list = _apply_fill(selected_element, bubble_list, config)
+            bubble_list = _apply_fill(selected_element, bubble_list, excludes, required, config)
         else:
             bubble_list = _apply_element(selected_element, bubble_list, config)
 
     # Apply the fill to our level
-    bubble_list = _apply_fill(selected_fill, bubble_list, config)
+    bubble_list = _apply_fill(selected_fill, bubble_list, excludes, required, config)
 
     if return_string: # Give output as one string.
         return _list_to_string(bubble_list)
@@ -103,7 +103,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         return _list_to_2D(bubble_list, config)
 
 def test():
-    output = generate_level(1,1, required=['diagonalR2'], only_required=True)
+    output = generate_level(1,1, required = ['diagonalR2', 'windmill', 0, 8], only_required = True)
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))
