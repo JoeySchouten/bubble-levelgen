@@ -10,6 +10,7 @@ The output is intended to be used in your own game.
 
 ## Installation
 This is intended to be used as a module or package. Add the file to the folder with your other modules and import it in your program.
+
 `from levelgen import generate_level`
 
 You can also import the dataclasses for your own use (see Data Classes below):
@@ -23,12 +24,15 @@ You may wish to do this if:
 ## Execution and Usage
 The generate_level() function returns a 2D List* containing the generated level. 
 At it's most basic use, the function takes two arguments: the world number and level number, like so:
+
 `new_level = generate_level(1,2)`
 
 The function can take many other arguments, however, which will allow you to control its output, for example:
+
     newer_level = generate_level(1,2, 
         required=[1, 2, 'diagonalR2'], 
         only_required=True)
+
 See the 'examples.py' file for more examples as well as a test function that provides an easier to read output.
 It is recommended to combine this code with a spreadsheet or other method of organising your input.
 You can then take the generated level and store it in a .JSON-file for use in your own game, for instance.
@@ -95,6 +99,7 @@ This module makes use of three different dataclasses, which together make up all
 
 ### Fill
 A special element that is used to fill up the playing field after other elements have been placed.
+
     name : str 
         fill name, make sure this is unique
     cost : int
