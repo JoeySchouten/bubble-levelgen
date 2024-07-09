@@ -120,7 +120,7 @@ DESIGNS = [ # These are based on default field width and height
           output = [
                [7, 0, 0, 7],
                [7, 1, 7],
-               [0, 7, 7],
+               [0, 3, 3, 0],
                [7, 1, 7],
                [7, 1, 1, 7],
                ]), 

@@ -9,9 +9,6 @@ from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, _lis
 # add ability to take additional arguments to determine # of colors
 # add ability to use letter colors for non-fill design elements
 
-# _jump_row:
-# fix elements not lining up properly when started on odd line, see fireworks
-
 # _weighted_roll()
 # fix weighted roll quick fix
 # change weighted roll to return element again instead of index
@@ -106,7 +103,7 @@ def generate_level(
         return _list_to_2D(bubble_list, config)
 
 def test():
-    output = generate_level(1,1, required = ['diagonalR2', 2, 3], only_required = True)
+    output = generate_level(1,1, required = ['diagonalR2', 'windmill', 0, 8], only_required = True)
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))

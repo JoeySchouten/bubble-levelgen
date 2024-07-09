@@ -173,10 +173,10 @@ def _get_widest(output):
 def _jump_row(index, row, is_odd_row, config):
     """Skips to the next row."""
     if is_odd_row:
-        index += (config.field_width - len(row)-1)
+        index += (config.field_width - len(row))
         is_odd_row = False
     else:
-        index += (config.field_width - len(row))
+        index += (config.field_width-1 - len(row))
         is_odd_row = True
     return index, is_odd_row
 
