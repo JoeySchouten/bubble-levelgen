@@ -1,7 +1,7 @@
 import random
 
 def _apply_element(element, list, config):
-    """Applies the output of an element to the list of bubbles."""
+    """Apply the output of an element to the list of bubbles."""
     list_to_return = list
     index = 0
     is_odd_row = True
@@ -35,7 +35,7 @@ def _apply_element(element, list, config):
     return list_to_return
 
 def _apply_fill(fill, list, excludes, required, config):
-    """Applies the output of a fill to the list of bubbles and returns the new list."""
+    """Apply the output of a fill to the list of bubbles and return the new list."""
     list_to_return = list
     fill_to_apply = _color_swap(fill, _filter_colors(list, 4, excludes), required)
 
@@ -48,7 +48,7 @@ def _apply_fill(fill, list, excludes, required, config):
     return list_to_return
 
 def _color_swap(element, color_list, required):
-    """Swaps string color variables to integers."""
+    """Swap string color variables to integers."""
     list_to_return = []
     required_colors = []
     color_dict = {}
@@ -58,7 +58,8 @@ def _color_swap(element, color_list, required):
         if isinstance(entry, int):
             required_colors.append(entry)
 
-    # Go through the output and replace strings with integers. Takes any required colors first.
+    # Go through the output and replace strings with integers. 
+    # Takes any required colors first.
     for entry in element.output:
         if isinstance(entry, str):
             if entry not in color_dict:
@@ -67,7 +68,7 @@ def _color_swap(element, color_list, required):
                     if color_dict[entry] in color_list:
                         color_list.remove(color_dict[entry])
                 else:
-                    color_dict[entry] = color_list.pop(random.randint(0, len(color_list)-1))
+                    color_dict[entry] = color_list.pop(random.randint(0, len(color_list) - 1))
 
         if entry in color_dict:
             list_to_return.append(color_dict[entry])
@@ -76,9 +77,9 @@ def _color_swap(element, color_list, required):
     return list_to_return
 
 def _filter_colors(bubble_list, min_colors, excludes):
-    """Takes the range of basic color ints and removes the ones in use. Will then pad the range with random ints if there would not be enough colors in the list."""
+    """Take the range of basic color ints and remove the ones in use. Then pad the range with random ints if there would not be enough colors."""
     colors_to_return = []
-    for number in range(1,10):
+    for number in range(1, 10):
         colors_to_return.append(number)
     
     # Filter out all of the used integers
@@ -93,12 +94,12 @@ def _filter_colors(bubble_list, min_colors, excludes):
     
     # If not enough colors to satisfy the min_colors, add random colors until we do.
     while len(colors_to_return) < min_colors:
-        colors_to_return.append(random.randint(1,9))
+        colors_to_return.append(random.randint(1, 9))
 
     return colors_to_return
 
 def _filter_list(excludes, list_to_filter):
-    """Filters a list based on provided keywords or names and returns the list without those matches."""
+    """Filter a list based on provided keywords or names and return the list without those matches."""
     filtered_list = []
     for entry in list_to_filter:
         add_to_list = True
@@ -128,7 +129,7 @@ def _filter_list(excludes, list_to_filter):
     return filtered_list
 
 def _get_starting_index(element, config):
-    """Picks a random legal starting location on the grid and returns the starting index and if this is on an odd/even row."""
+    """Pick a random legal starting location on the grid and return the starting index and if this is an odd or even row."""
     starting_index = 0
     widest_row_width = _get_widest(element.output)
     
@@ -145,10 +146,11 @@ def _get_starting_index(element, config):
 
     # Get correct x_axis offset depending on which row we start on.
     if y_axis % 2 == 0: 
-        x_axis = random.randint(x_start, config.field_width - (widest_row_width+1)) # Adding the 1 means it doesn't accidentally cut off the next row.
+        # Adding the 1 prevents it from accidentally cutting off the next row.
+        x_axis = random.randint(x_start, config.field_width - (widest_row_width + 1))
         is_odd_row = False
     else:
-        x_axis = random.randint(x_start, (config.field_width-1) - widest_row_width)
+        x_axis = random.randint(x_start, (config.field_width - 1) - widest_row_width)
         is_odd_row = True
     
     # Set starting bubble index, starting with the correct row.
@@ -156,14 +158,14 @@ def _get_starting_index(element, config):
         if row_nr % 2 == 0:
             starting_index += config.field_width
         else:
-            starting_index += config.field_width-1
+            starting_index += config.field_width - 1
 
     # Now move to the correct column.
     starting_index += x_axis
     return starting_index, is_odd_row
 
 def _get_widest(output):
-    """Returns the length of the widest row in the output."""
+    """Return the length of the widest row in the output."""
     widest_row = []
     for row in output:
         if len(row) > len(widest_row):
@@ -171,17 +173,17 @@ def _get_widest(output):
     return len(widest_row)
 
 def _jump_row(index, row, is_odd_row, config):
-    """Skips to the next row."""
+    """Skip to the next row."""
     if is_odd_row:
         index += (config.field_width - len(row))
         is_odd_row = False
     else:
-        index += (config.field_width-1 - len(row))
+        index += (config.field_width - 1 - len(row))
         is_odd_row = True
     return index, is_odd_row
 
 def _list_to_2D(list, config):
-    """Changes the bubble list input to a 2D List to return."""
+    """Change the bubble list input to a 2D List to return."""
     list_to_return = []
 
     for index in range(0, config.field_height):
@@ -190,14 +192,14 @@ def _list_to_2D(list, config):
             for i in range(0, config.field_width):
                 temp_list.append(list.pop(0))
         else:
-            for i in range(0, config.field_width-1):
+            for i in range(0, config.field_width - 1):
                 temp_list.append(list.pop(0))
         list_to_return.append(temp_list)
         
     return list_to_return
 
 def _list_to_string(list):
-    """Changes the bubble list input to a string to return."""
+    """Change the bubble list input to a string to return."""
     string_to_return = ''
 
     for entry in list:
@@ -206,7 +208,7 @@ def _list_to_string(list):
     return string_to_return
 
 def _verify_legal_placement(element, list, config, index, is_odd_row):
-    """Makes sure the selected element can legally be placed completely in the selected area."""
+    """Make sure the selected element can legally be placed completely in the selected area."""
     # If the element is set to override, any placement is legal!
     if element.override == True:
         return True
@@ -227,8 +229,10 @@ def _verify_legal_placement(element, list, config, index, is_odd_row):
         return True
     
 def _weighted_roll(elements_set):
-    """Return a random index from a list with items with weighted chances"""
-    
+    """Return a random index from a list with items with weighted chances."""
+    # Ensure we always at least return a random element.
+    element_to_return = random.choice(elements_set)
+
     # Get the total weight and accumulated weights.
     total_weight = 0
     accumulated_weights = []
@@ -242,6 +246,6 @@ def _weighted_roll(elements_set):
     # Find the element matching the roll result.
     for element in elements_set:
         if roll < accumulated_weights[elements_set.index(element)]:
-            return elements_set.index(element)
+            element_to_return = element
         
-    return -1 #TODO: fix this, this is a quick fix for falling out of the element sets.
+    return element_to_return
