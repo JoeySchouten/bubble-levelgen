@@ -4,23 +4,6 @@ from consts import DESIGNS, FILLS
 from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, \
     _list_to_string, _weighted_roll
 
-#TODO:
-# generate_level():
-# add ability to take additional arguments to determine # of colors
-# add ability to use letter colors for non-fill design elements
-# rewrite docstring
-
-# README.md
-# add description to README
-# add functions to README
-# add string caveat to README -> can only do 0-9 as string
-# change references to 9x8 field to 8x8
-# add caveat that if you use treat_as_fill on design element you need to deliver one single list
-# if not, deliver a list for each row
-# change dataclass types for output from int to list
-
-# Balancing
-# Adjust numbers on everything
 
 @dataclass
 class GeneratorConfig:
@@ -40,6 +23,29 @@ def generate_level(
     
     Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
     based on entered config parameters, element and fill arrays.
+
+    Parameters
+    ----------
+    world : int
+        the number of the world, used to determine difficulty
+    level: int
+        the number of the level, used to determine difficulty
+    stars: int, optional
+        the number of stars required to unlock the level, used to determine difficulty (default is 0)
+    required: list, optional
+        a list of additional requirements for the method, this can be int for colors, and string for names or keywords (default is empty)
+    excludes: list, optional
+        a list of things to exclude from the generation, this can be int for colors, and string for names or keywords (default is empty)
+    elements_set: list, optional
+        the list of DesignElements to incorporate (default is DESIGNS from consts.py)
+    fill_set: list, optional
+        the list of Fills to incorporate (default is FILLS from consts.py)
+    config: GeneratorConfig, optional
+        the configuration for this function (default is a default GeneratorConfig)
+    return_string: bool, optional
+        a flag used to return a string instead of a 2D List. Legacy option. (default is False)
+    only_required: bool, optional
+        a flag used to make the function only use the specified requirements and no additions (default is False)
     """
 
     # Get total difficulty to spend on this level.
@@ -82,7 +88,6 @@ def generate_level(
     for element in elements_set:
         if element.name in required:
             queued_elements.append(element)
-            print('queued ' + element.name)
     
     for element in queued_elements:
         spent_difficulty += element.cost
@@ -90,7 +95,6 @@ def generate_level(
             bubble_list = _apply_fill(element, bubble_list, config)
         else:
             bubble_list = _apply_element(element, bubble_list, config)
-            print('applied element')
 
     # Roll design elements, apply them, and add the cost to what we have spent.
     elements_to_roll = _filter_list(excludes, elements_set)
@@ -110,11 +114,4 @@ def generate_level(
     else: # Give output as 2D List.
         return _list_to_2D(bubble_list, config)
 
-def test():
-    output = generate_level(1,1)
-    for row in output:
-        test_string = " ".join(map(str, row))
-        print(test_string.center(20))
-    print("Done!")
 
-test()
