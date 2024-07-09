@@ -34,10 +34,10 @@ def _apply_element(element, list, config):
         
     return list_to_return
 
-def _apply_fill(fill, list, excludes, config):
+def _apply_fill(fill, list, excludes, required, config):
     """Applies the output of a fill to the list of bubbles and returns the new list."""
     list_to_return = list
-    fill_to_apply = _color_swap(fill, _filter_colors(list, 4, excludes))
+    fill_to_apply = _color_swap(fill, _filter_colors(list, 4, excludes), required)
 
     # Overwrite any empty spaces with the fill or just overwrite anything with override=True.
     for index in range(len(fill_to_apply)):
@@ -47,17 +47,27 @@ def _apply_fill(fill, list, excludes, config):
 
     return list_to_return
 
-def _color_swap(element, color_list):
+def _color_swap(element, color_list, required):
     """Swaps string color variables to integers."""
     list_to_return = []
+    required_colors = []
     color_dict = {}
 
-    # Translate the string variables to given integers from the dict; if not a string, we just put in the integer present.
+    # Add any required colors to their own list
+    for entry in required:
+        if isinstance(entry, int):
+            required_colors.append(entry)
+
+    # Go through the output and replace strings with integers. Takes any required colors first.
     for entry in element.output:
-        # Check if the entry is a string, and if so, add it as a key to the dict.
         if isinstance(entry, str):
             if entry not in color_dict:
-                color_dict[entry] = color_list.pop(random.randint(0, len(color_list)-1))
+                if len(required_colors) != 0:
+                    color_dict[entry] = required_colors.pop(0)
+                    if color_dict[entry] in color_list:
+                        color_list.remove(color_dict[entry])
+                else:
+                    color_dict[entry] = color_list.pop(random.randint(0, len(color_list)-1))
 
         if entry in color_dict:
             list_to_return.append(color_dict[entry])
@@ -81,7 +91,7 @@ def _filter_colors(bubble_list, min_colors, excludes):
         if entry in colors_to_return:
             colors_to_return.remove(entry)
     
-    # if we now do not have enough integers to draw up to 4 colors, append a random one until we do.
+    # If not enough colors to satisfy the min_colors, add random colors until we do.
     while len(colors_to_return) < min_colors:
         colors_to_return.append(random.randint(1,9))
 

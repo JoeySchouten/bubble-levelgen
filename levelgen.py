@@ -2,17 +2,15 @@ from dataclasses import dataclass
 
 from consts import DESIGNS, FILLS
 
-from helpers import _apply_element, _apply_fill, _color_swap, _filter_list, _list_to_2D, _list_to_string, _weighted_roll
+from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, _list_to_string, _weighted_roll
 
 #TODO:
 # generate_level():
 # add ability to take additional arguments to determine # of colors
+# add ability to use letter colors for non-fill design elements
 
-# dataclasses and _apply_*()
-# add ability to set colors for these -> if none just random
-
-# _filter_colors:
-# make it look into output that is not fills -> isinstance(output[0], list)?
+# _jump_row:
+# fix elements not lining up properly when started on odd line, see fireworks
 
 # _weighted_roll()
 # fix weighted roll quick fix
@@ -40,7 +38,9 @@ class GeneratorConfig:
     field_height: int = 8
 
 
-def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], elements_set=DESIGNS, fill_set=FILLS, return_string=False, only_required=False):
+def generate_level(
+            world, level, stars=0, config=GeneratorConfig(), required=[], excludes=[], 
+            elements_set=DESIGNS, fill_set=FILLS, return_string=False, only_required=False):
     """Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
     based on entered config parameters, element and fill arrays."""
 
@@ -93,12 +93,12 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         selected_element = elements_to_roll[_weighted_roll(elements_to_roll)]
         spent_difficulty += selected_element.cost
         if selected_element.treat_as_fill:
-            bubble_list = _apply_fill(selected_element, bubble_list, excludes, config)
+            bubble_list = _apply_fill(selected_element, bubble_list, excludes, required, config)
         else:
             bubble_list = _apply_element(selected_element, bubble_list, config)
 
     # Apply the fill to our level
-    bubble_list = _apply_fill(selected_fill, bubble_list, excludes, config)
+    bubble_list = _apply_fill(selected_fill, bubble_list, excludes, required, config)
 
     if return_string: # Give output as one string.
         return _list_to_string(bubble_list)
@@ -106,7 +106,7 @@ def generate_level(world, level, stars=0, config=GeneratorConfig(), required=[],
         return _list_to_2D(bubble_list, config)
 
 def test():
-    output = generate_level(1,1, excludes=[7])
+    output = generate_level(1,1, required = ['diagonalR2', 2, 3], only_required = True)
     for row in output:
         test_string = " ".join(map(str, row))
         print(test_string.center(20))
