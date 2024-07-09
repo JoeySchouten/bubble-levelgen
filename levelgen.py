@@ -7,18 +7,35 @@ from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, \
 
 @dataclass
 class GeneratorConfig:
-    """Configuration data for the level generator."""
-    base_difficulty: int = 10
+    """Configuration data for the level generator.
+    
+    Parameters
+    ----------
+    base_difficulty : int
+        gets multiplied with the world number to reach a starting difficulty
+    diff_per_level : int
+        difficulty added per level
+    diff_per_star : int
+        difficulty per star
+    field_width : int
+        the maximum number of bubbles in your top row
+    field_height : int
+        the maximum number of rows in your playing field
+    return_string : bool, optional
+        a flag used to return the output as one single string instead for compatibility reasons (default = False)
+    """
+    base_difficulty: int = 20
     diff_per_level: int = 1
     diff_per_star: int = 1
     field_width: int = 8
     field_height: int = 8
+    return_string: bool = False
 
 
 def generate_level(
             world, level, stars=0,  required=[], excludes=[],
             elements_set=DESIGNS, fill_set=FILLS, config=GeneratorConfig(),
-            return_string=False, only_required=False):
+            only_required=False):
     """Generate a level based on the provided designs and parameters.
     
     Generates a 2d Array or string that contains all of the integers for the level .JSON-file 
@@ -28,23 +45,21 @@ def generate_level(
     ----------
     world : int
         the number of the world, used to determine difficulty
-    level: int
+    level : int
         the number of the level, used to determine difficulty
-    stars: int, optional
+    stars : int, optional
         the number of stars required to unlock the level, used to determine difficulty (default is 0)
-    required: list, optional
+    required : list, optional
         a list of additional requirements for the method, this can be int for colors, and string for names or keywords (default is empty)
-    excludes: list, optional
+    excludes : list, optional
         a list of things to exclude from the generation, this can be int for colors, and string for names or keywords (default is empty)
-    elements_set: list, optional
+    elements_set : list, optional
         the list of DesignElements to incorporate (default is DESIGNS from consts.py)
-    fill_set: list, optional
+    fill_set : list, optional
         the list of Fills to incorporate (default is FILLS from consts.py)
-    config: GeneratorConfig, optional
+    config : GeneratorConfig, optional
         the configuration for this function (default is a default GeneratorConfig)
-    return_string: bool, optional
-        a flag used to return a string instead of a 2D List. Legacy option. (default is False)
-    only_required: bool, optional
+    only_required : bool, optional
         a flag used to make the function only use the specified requirements and no additions (default is False)
     """
 
@@ -109,7 +124,7 @@ def generate_level(
     # Apply the fill to our level
     bubble_list = _apply_fill(selected_fill, bubble_list, excludes, required, config)
 
-    if return_string: # Give output as one string.
+    if config.return_string: # Give output as one string.
         return _list_to_string(bubble_list)
     else: # Give output as 2D List.
         return _list_to_2D(bubble_list, config)

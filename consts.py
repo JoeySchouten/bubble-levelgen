@@ -3,8 +3,32 @@ from dataclasses import dataclass
 @dataclass
 class DesignElement:
     """Level Design Element that provides a string that can be loaded onto the list of bubbles.
+
     If treat_as_fill is True, make sure to provide an output that will run from the first bubble.
-    If not, provide the output in a 2D list with a list per row. Remember to use leading zeroes in your designs when needed."""
+    If not, provide the output in a 2D list with a list per row. Remember to use leading zeroes in your designs when needed.
+
+    Parameters
+    ----------
+     name : str
+        element name - make sure this is unique
+    cost : int
+        difficulty cost
+    chance_weight : int
+        how much this element is weighted in determining which elements to pick
+    keywords: list
+        a list of strings that can be used to filter out the element from the available elements
+    output : list
+        the bubbles of which the design element consists
+    y_min : int, optional
+        minimal starting point for the design element, allows you to better position elements (default = 0)
+    y_max : int, optional
+        maximum starting point for the design element, allows you to better position elements (default = 0)
+    treat_as_fill : bool, optional
+        a flag used to determine whether to use the apply fill method rather than the apply element method
+        if True, make sure to supply a fill as single long list that spans your playing field (default = False)
+    override : bool, optional
+        a flag used to make the element overwrite any existing bubbles (default = False)
+    """
     name: str
     cost: int
     chance_weight: int
@@ -13,11 +37,27 @@ class DesignElement:
     y_min: int = 0
     y_max: int = 0
     treat_as_fill: bool = False
-    override: bool = True
+    override: bool = False
 
 @dataclass
 class Fill:
-    """Level Design Fill that can be used to fill in the spaces between design elements."""
+    """Level Design Fill that is used to fill in the spaces between design elements after generation.
+
+    Parameters
+    ----------
+    name : str 
+        fill name, make sure this is unique
+    cost : int
+        base difficulty cost
+    chance_weight : int
+        how much this element is weighted in determining which fill to pick
+    output : list
+        the bubbles of which the fill consists
+    keywords : list
+        a list of strings that can be used to filter out the fill from the available fills
+    override : bool, optional 
+        a flag used to make the fill overwrite any existing bubbles (default = False)
+    """
     name: str
     cost: int
     chance_weight: int
@@ -27,7 +67,7 @@ class Fill:
 
 
 DESIGNS = [ # These are based on default field width and height
-     DesignElement(name = 'torii', cost = 6, chance_weight = 1, treat_as_fill = True,
+     DesignElement(name = 'torii', cost = 20, chance_weight = 1, treat_as_fill = True,
           keywords = ['fill', 'japan'],
           output = [
                0, 0, 0, 0, 0, 0, 0, 0,
@@ -39,26 +79,26 @@ DESIGNS = [ # These are based on default field width and height
                0, 2, 0, 0, 0, 0 ,2, 0, 
                2, 0, 0, 0, 0, 0, 2,
                ]),
-     DesignElement(name = 'fireworks', cost = 3, chance_weight = 1, y_max = 1,
+     DesignElement(name = 'fireworks', cost = 15, chance_weight = 3, y_max = 1,
           keywords = ['locked'],
           output = [
                [0, 24, 24],
                [24, 97, 24],
                ]),
-     DesignElement(name = 'cloud', cost = 3, chance_weight = 1,
+     DesignElement(name = 'cloud', cost = 10, chance_weight = 5, y_max = 1,
           keywords = [],
           output = [
                [0, 7, 7],
                [7, 7, 7],
                ]),
-     DesignElement(name = 'cloudJP', cost = 3, chance_weight = 1,
+     DesignElement(name = 'cloudJP', cost = 10, chance_weight = 5, y_max = 1,
           keywords = ['japan'],
           output = [
                [7, 7, 7, 7],
                [0, 0, 7],
                [0, 7, 7, 7, 7],
                ]),
-     DesignElement(name = 'cherrytree', cost = 3, chance_weight = 1,
+     DesignElement(name = 'cherrytree', cost = 30, chance_weight = 1,
           keywords = ['japan'],
           output = [
                [0, 5, 5, 0],
@@ -69,7 +109,7 @@ DESIGNS = [ # These are based on default field width and height
                [0, 1, 0],
                [0, 1, 1, 0],
                ]),
-     DesignElement(name = 'pinetree', cost = 3, chance_weight = 1,
+     DesignElement(name = 'pinetree', cost = 30, chance_weight = 1,
           keywords = [],
           output = [
                [0, 0, 0, 0],
@@ -80,7 +120,7 @@ DESIGNS = [ # These are based on default field width and height
                [0, 1, 0],
                [0, 1, 1, 0],
                ]),
-     DesignElement(name = 'tree', cost = 3, chance_weight = 1,
+     DesignElement(name = 'tree', cost = 30, chance_weight = 1,
           keywords = [],
           output = [
                [0, 9, 9, 0],
@@ -91,7 +131,7 @@ DESIGNS = [ # These are based on default field width and height
                [0, 1, 0],
                [0, 1, 1, 0],
                ]),
-     DesignElement(name = 'mountain', cost = 6, chance_weight = 1, treat_as_fill = True,
+     DesignElement(name = 'mountain', cost = 60, chance_weight = 1, treat_as_fill = True,
           keywords = ['fill', 'japan'],
           output = [
                0, 0, 0, 2, 2, 0, 0, 0,
@@ -103,7 +143,7 @@ DESIGNS = [ # These are based on default field width and height
                0, 8, 8, 8, 8, 8 ,8, 0, 
                8, 8, 8, 8, 8, 8, 8,
                ]),
-     DesignElement(name = 'bridge', cost = 6, chance_weight = 1, treat_as_fill = True,
+     DesignElement(name = 'bridge', cost = 20, chance_weight = 1, treat_as_fill = True,
           keywords = ['fill'],
           output = [
                0, 0, 0, 0, 0, 0, 0, 0,
@@ -115,7 +155,7 @@ DESIGNS = [ # These are based on default field width and height
                7, 7, 0, 0, 0, 0, 7, 7, 
                7, 0, 0, 0, 0, 0, 7,
                ]),
-     DesignElement(name = 'windmill', cost = 3, chance_weight = 1,
+     DesignElement(name = 'windmill', cost = 40, chance_weight = 1,
           keywords = ['ned'],
           output = [
                [7, 0, 0, 7],
@@ -127,7 +167,7 @@ DESIGNS = [ # These are based on default field width and height
 ]
 
 FILLS = [   # These are based on default field width and height
-     Fill(name = 'ireland', cost = 1, chance_weight = 4, 
+     Fill(name = 'ireland', cost = 10, chance_weight = 1, 
           keywords = ['flag', 'ire'],
           output = [
                9, 9, 7, 7, 7, 7, 3, 3,
@@ -138,7 +178,7 @@ FILLS = [   # These are based on default field width and height
                9, 9, 7, 7, 7, 3, 3,
                9, 9, 7, 7, 7, 7, 3, 3,
                ]),
-     Fill(name = 'netherlands', cost = 1, chance_weight = 4, 
+     Fill(name = 'netherlands', cost = 10, chance_weight = 1, 
           keywords = ['flag', 'ned'],
           output = [
                2, 2, 2, 2, 2, 2, 2, 2,
@@ -149,7 +189,7 @@ FILLS = [   # These are based on default field width and height
                6, 6, 6, 6, 6, 6, 6,
                0, 0, 0, 0, 0, 0, 0, 0,
                ]),
-     Fill(name = 'japan', cost = 1, chance_weight = 4, 
+     Fill(name = 'japan', cost = 10, chance_weight = 1, 
           keywords = ['flag', 'japan'],
           output = [
                7, 7, 7, 7, 7, 7, 7, 7,
@@ -160,7 +200,7 @@ FILLS = [   # These are based on default field width and height
                7, 7, 7, 7, 7, 7, 7,
                7, 7, 7, 7, 7, 7, 7, 7,
                ]),
-     Fill(name = 'ustates', cost = 1, chance_weight = 4, 
+     Fill(name = 'ustates', cost = 10, chance_weight = 1, 
           keywords = ['flag', 'usa'],
           output = [
                7, 6, 6, 2, 2, 2, 2, 2,
@@ -171,7 +211,7 @@ FILLS = [   # These are based on default field width and height
                0, 0, 0, 0, 0, 0, 0,
                0, 0, 0, 0, 0, 0, 0, 0,
                ]),
-     Fill(name = 'australia', cost = 1, chance_weight = 4, 
+     Fill(name = 'australia', cost = 10, chance_weight = 1, 
           keywords = ['flag', 'aus'],
           output = [
                2, 6, 2, 6, 6, 6, 6, 6,
@@ -182,7 +222,7 @@ FILLS = [   # These are based on default field width and height
                6, 7, 6, 6, 7, 6, 6,
                6, 6, 6, 6, 6, 6, 6, 6,
                ]),
-     Fill(name = 'skyground', cost = 1, chance_weight = 4, 
+     Fill(name = 'skyground', cost = 10, chance_weight = 4, 
           keywords = ['day', 'night'],
           output = [
                6, 6, 6, 6, 6, 6, 6, 6,
@@ -193,7 +233,7 @@ FILLS = [   # These are based on default field width and height
                0, 0, 0, 0, 0, 0, 0,
                0, 0, 0, 0, 0, 0, 0, 0,
                ]),
-     Fill(name = 'skygroundDUSK', cost = 1, chance_weight = 4, 
+     Fill(name = 'skygroundDUSK', cost = 10, chance_weight = 4, 
           keywords = ['dusk'],
           output = [
                3, 3, 3, 3, 3, 3, 3, 3,
@@ -204,7 +244,7 @@ FILLS = [   # These are based on default field width and height
                0, 0, 0, 0, 0, 0, 0,
                0, 0, 0, 0, 0, 0, 0, 0,
                ]),
-     Fill(name = 'city', cost = 1, chance_weight = 4, 
+     Fill(name = 'city', cost = 30, chance_weight = 4, 
           keywords = [],
           output = [
                6, 6, 6, 6, 6, 6, 6, 6,
@@ -215,7 +255,7 @@ FILLS = [   # These are based on default field width and height
                8, 8, 0, 8, 0, 8, 8,
                0, 0, 0, 0, 0, 0, 0, 0,
                ]),
-     Fill(name = 'frame', cost = 1, chance_weight = 4, override = True, 
+     Fill(name = 'frame', cost = 40, chance_weight = 4, override = True, 
           keywords = ['museum'],
           output = [
                1, 1, 1, 8, 8, 1, 1, 1,
@@ -228,7 +268,7 @@ FILLS = [   # These are based on default field width and height
                1, 1, 8, 8, 8, 1, 1,
                ]),
      # Name goes 'diagonal[Direction (L/R)][number of colors]'
-     Fill(name = 'diagonalR2', cost = 1, chance_weight = 4, 
+     Fill(name = 'diagonalR2', cost = 30, chance_weight = 4, 
           keywords = ['diagonal'],
           output = [
                'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B',
@@ -240,7 +280,7 @@ FILLS = [   # These are based on default field width and height
                'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A',
                'B', 'A', 'B', 'A', 'B', 'A', 'B',
                ]),
-     Fill(name = 'diagonalR3', cost = 1, chance_weight = 4,
+     Fill(name = 'diagonalR3', cost = 30, chance_weight = 4,
           keywords = ['diagonal'],
           output = [
                'A', 'B', 'C', 'A', 'B', 'C', 'A', 'B',
@@ -252,7 +292,7 @@ FILLS = [   # These are based on default field width and height
                'A', 'B', 'C', 'A', 'B', 'C', 'A', 'B',
                'A', 'B', 'C', 'A', 'B', 'C', 'A',
                ]),
-     Fill(name = 'diagonalR4', cost = 1, chance_weight = 4, 
+     Fill(name = 'diagonalR4', cost = 30, chance_weight = 4, 
           keywords = ['diagonal'],
           output = [
                'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D',
@@ -264,7 +304,7 @@ FILLS = [   # These are based on default field width and height
                'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A',
                'B', 'C', 'D', 'A', 'B', 'C', 'D',
                ]),
-     Fill(name = 'diagonalL2', cost = 1, chance_weight = 4,
+     Fill(name = 'diagonalL2', cost = 30, chance_weight = 4,
           keywords = ['diagonal'],
           output = [
                'B', 'A', 'B', 'A', 'B', 'A', 'B', 'A',
@@ -276,7 +316,7 @@ FILLS = [   # These are based on default field width and height
                'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B',
                'B', 'A', 'B', 'A', 'B', 'A', 'B',
                ]),
-     Fill(name = 'diagonalL3', cost = 1, chance_weight = 4,
+     Fill(name = 'diagonalL3', cost = 30, chance_weight = 4,
           keywords = ['diagonal'],
           output = [
                'B', 'A', 'C', 'B', 'A', 'C', 'B', 'A',
@@ -288,7 +328,7 @@ FILLS = [   # These are based on default field width and height
                'B', 'A', 'C', 'B', 'A', 'C', 'B', 'A',
                'A', 'C', 'B', 'A', 'C', 'B', 'A',
                ]),
-     Fill(name = 'diagonalL4', cost = 1, chance_weight = 4,
+     Fill(name = 'diagonalL4', cost = 30, chance_weight = 4,
           keywords = ['diagonal'],
           output = [
                'D', 'C', 'B', 'A', 'D', 'C', 'B', 'A',
@@ -300,7 +340,7 @@ FILLS = [   # These are based on default field width and height
                'A', 'D', 'C', 'B', 'A', 'D', 'C', 'B',
                'D', 'C', 'B', 'A', 'D', 'C', 'B',
                ]),
-     Fill(name = 'columns2narrow', cost = 1, chance_weight = 4,
+     Fill(name = 'columns2narrow', cost = 30, chance_weight = 4,
           keywords = ['column'],
           output = [
                'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B',
@@ -312,7 +352,7 @@ FILLS = [   # These are based on default field width and height
                'A', 'B', 'A', 'B', 'A', 'B', 'A', 'B',
                'A', 'B', 'A', 'B', 'A', 'B', 'A',
                ]),
-     Fill(name = 'columns2broad', cost = 1, chance_weight = 4,
+     Fill(name = 'columns2broad', cost = 30, chance_weight = 4,
           keywords = ['column'],
           output = [
                'A', 'A', 'B', 'B', 'A', 'A', 'B', 'B',
@@ -324,7 +364,7 @@ FILLS = [   # These are based on default field width and height
                'A', 'A', 'B', 'B', 'A', 'A', 'B', 'B',
                'A', 'A', 'B', 'B', 'A', 'A', 'B',
                ]),
-     Fill(name = 'columns3', cost = 1, chance_weight = 4,
+     Fill(name = 'columns3', cost = 30, chance_weight = 4,
           keywords = ['column'],
           output = [
                'A', 'B', 'C', 'A', 'B', 'C', 'A', 'B',
@@ -336,7 +376,7 @@ FILLS = [   # These are based on default field width and height
                'A', 'B', 'C', 'A', 'B', 'C', 'A', 'B',
                'A', 'B', 'C', 'A', 'B', 'C', 'A',
                ]),
-     Fill(name = 'columns4', cost = 1, chance_weight = 4,
+     Fill(name = 'columns4', cost = 30, chance_weight = 4,
           keywords = ['column'],
           output = [
                'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D',

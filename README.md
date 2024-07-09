@@ -2,74 +2,146 @@
  Level Generation Code for Bubble Shooter Games
 
 ## Description
--What do
--How do
--What makes a level hard?
+This code generates bubble grids for Bubble Shooter games. 
+Each level is built up from a number of Designs and a Fill, which we'll call 'elements'.
+Elements are selected through a weighted roll, and 'cost' difficulty. The program keeps applying elements until the alloted difficulty - decided through arguments - is 'spent'.
+Additional parameters for elements and the function allow for more control over the output by filtering or queueing elements.
+The output is intended to be used in your own game.
 
 ## Installation
-This is a .py-file intended to be used as a module. Add the file to the folder with your other modules and import it in your program.
-    from levelgen import generate_level
+This is intended to be used as a module or package. Add the file to the folder with your other modules and import it in your program.
+`from levelgen import generate_level`
+
+You can also import the dataclasses for your own use (see Data Classes below):
+    from consts import Fill, DesignElement
+    from levelgen import GeneratorConfig
+You may wish to do this if:
+- your playing field is not 8x8,
+- you wish to supply your own designs,
+- or you wish to make edits to the configuration.
 
 ## Execution and Usage
-The generate_level() function returns either a 2D List or a String containing the generated level. 
+The generate_level() function returns a 2D List* containing the generated level. 
 At it's most basic use, the function takes two arguments: the world number and level number, like so:
-
 `new_level = generate_level(1,2)`
 
-You can then take that output and use it in your game. The higher your world and level numbers, the more difficulty the function gets to 'spend', and as a result your level should be harder. Since the module comes with its own configuration and sets of design elements and fills, this is all you technically need if you use a 9x8 playing field.
+The function can take many other arguments, however, which will allow you to control its output, for example:
+    newer_level = generate_level(1,2, 
+        required=[1, 2, 'diagonalR2'], 
+        only_required=True)
+See the 'examples.py' file for more examples as well as a test function that provides an easier to read output.
+It is recommended to combine this code with a spreadsheet or other method of organising your input.
+You can then take the generated level and store it in a .JSON-file for use in your own game, for instance.
 
-The function can take a lot more arguments, however, allowing you to customize it to work with your own designs, level of difficulty, and your own playing field size.
+*There is a configuration option to return one String instead for compatiblity with available older projects such as [this bubble shooter project](https://github.com/tastelikecoke/shoot-bubble).
 
-`generate_level(world, level, stars=0, config=GeneratorConfig(), elements_set=DESIGNS, fill_set=FILLS, return_string=False)`
-
-Let's go over these arguments one by one and unpack them.
-
-### World (int)
-This is the world number - the idea being that each next world is more difficult than the last. Think of it as in the old Mario game: Level 3-1 should be harder than Level 1-1.
-
-### Level (int)
-This is the level number - as with the world number, each level gets more difficult as you go along. This should be a smaller step than between worlds.
-
-### Stars (int) default = 0
-The number of stars the player needs to have by the time they get to the level. Some games allow players to unlock levels by collecting stars or medals for their score, which can also be used as an indication of difficulty. A level that requires 10 stars to unlock should be easier than one that requires 100.
-
-### Config (GeneratorConfig) default = GeneratorConfig()
-This is where the configuration for the generator goes. This dataclass contains the most basic levers for the generator and contains your playing field size as well as how the difficulty scales. If not specified, it just takes the default version specified in the module. See more in the 'Data Classes' section below.
-
-### Element Set (List\[DesignElements\]) default = DESIGNS
-This is the list of Design Elements that the generator will pick from to populate the playing field. The module contains a default set of elements. See more in the 'Data Classes' section below.
-
-### Fill Set (List\[Fill\]) default = FILLS
-This is the list of Fills that the generator will pick from to fill in remaining spaces in the playing field after placing all Design Elements. The module contains a default set of fills. See more in the 'Data Classes' section below.
-
-### Return String (bool) default = False
-Whether the method returns the output as a 2D List (False) or as a single string (True). Generally you want to use the 2D List for easier use in your own project. However, if you use the single string method, it is compatible with available projects such as [this bubble shooter project](https://github.com/tastelikecoke/shoot-bubble).
+## Parameters
+    world : int
+        the number of the world, used to determine difficulty
+    level : int
+        the number of the level, used to determine difficulty
+    stars : int, optional
+        the number of stars required to unlock the level, used to determine difficulty (default is 0)
+    required : list, optional
+        a list of additional requirements for the method, this can be int for colors, and string for names or keywords (default is empty)
+    excludes : list, optional
+        a list of things to exclude from the generation, this can be int for colors, and string for names or keywords (default is empty)
+    elements_set : list, optional
+        the list of DesignElements to incorporate (default is DESIGNS from consts.py)
+    fill_set : list, optional
+        the list of Fills to incorporate (default is FILLS from consts.py)
+    config : GeneratorConfig, optional
+        the configuration for this function (default is a default GeneratorConfig)
+    only_required : bool, optional
+        a flag used to make the function only use the specified requirements and no additions (default is False)
 
 ## Data Classes
-This module makes use of three different dataclasses, which together make up all of the customization and configuration of the module. The module comes with a default set of each, but it is recommended to provide your own if you are using a playing field that is not 9x8 bubbles.
+This module makes use of three different dataclasses, which together make up all of the customization and configuration of the module. The module comes with a default set of each, but it is recommended to provide your own if you are using a playing field that is not 8x8 bubbles.
 
 ### GeneratorConfig
-Mainly detemrines the playing field size and difficulty scaling across levels.
-    base_difficulty: int - Starting difficulty; gets multiplied with the world number to reach a base difficulty for each world.
-    diff_per_level: int - Difficulty added per level.
-    diff_per_star: int - Difficulty per star.
-    field_width: int - The maximum number of bubbles in your top row.
-    field_height: int - The maximum number of rows in your playing field.
+    base_difficulty : int
+        gets multiplied with the world number to reach a starting difficulty
+    diff_per_level : int
+        difficulty added per level
+    diff_per_star : int
+        difficulty per star
+    field_width : int
+        the maximum number of bubbles in your top row
+    field_height : int
+        the maximum number of rows in your playing field
+    return_string : bool, optional
+        a flag used to return the output as one single string instead for compatibility reasons (default = False)
 
 ### DesignElement
-    name: str - Element name, make sure this is unique.
-    cost: int - Base difficulty cost.
-    chance_weight: int - How much this element is weighted in determining which elements to pick.
-    output: str - The bubbles the design element consists of.
-    override: bool - Whether the design element overwrites any existing bubbles. Default = True.
+    name : str
+        element name - make sure this is unique
+    cost : int
+        difficulty cost
+    chance_weight : int
+        how much this element is weighted in determining which elements to pick
+    keywords: list
+        a list of strings that can be used to filter out the element from the available elements
+    output : list
+        the bubbles of which the design element consists
+    y_min : int, optional
+        minimal starting point for the design element, allows you to better position elements (default = 0)
+    y_max : int, optional
+        maximum starting point for the design element, allows you to better position elements, is ignored at 0 (default = 0)
+    treat_as_fill : bool, optional
+        a flag used to determine whether to use the apply fill method rather than the apply element method
+        if True, make sure to supply a fill as single long list that spans your playing field (default = False)
+    override : bool, optional
+        a flag used to make the element overwrite any existing bubbles (default = False)
 
 ### Fill
-    name: str - Element name, make sure this is unique.
-    cost: int - Base difficulty cost.
-    chance_weight: int - How much this element is weighted in determining which fill to pick.
-    output: str - The bubbles the fill consists of.
-    override: bool  - Whether the fill overwrites any existing bubbles. Default = False.
+A special element that is used to fill up the playing field after other elements have been placed.
+    name : str 
+        fill name, make sure this is unique
+    cost : int
+        base difficulty cost
+    chance_weight : int
+        how much this element is weighted in determining which fill to pick
+    output : list
+        the bubbles of which the fill consists
+    keywords : list
+        a list of strings that can be used to filter out the fill from the available fills
+    override : bool, optional 
+        a flag used to make the fill overwrite any existing bubbles (default = False)
+
+## Bubble Legend
+    0 - Blank/Empty
+    1 - Brown
+    2 - Red
+    3 - Orange
+    4 - Yellow
+    5 - Pink
+    6 - Blue
+    7 - White
+    8 - Gray
+    9 - Green
+    10-19 - Unused
+    20 - Wild
+    21-39 - Locked versions of 1-19
+    97 - Explosion
+    98 - Fireworks Unlock
+    99 - Fireworks Launcher
+Note: this bubble legend is based off of the project for which this code is written and is used for all the elements provided.
 
 ## Current Features
+- Generates levels for Bubble Shooters based on provided Designs and Fills.
+- Comes with a set of 10 Design Elements and 19 Fills.
+- Designs can be supplied with a variety of arguments, such as:
+-- whether to treat it as a 2D list or as a Fill,
+-- minimum and maximum position on the y-axis,
+-- and whether to override previously placed elements.
+- Fills are lists that span the bubble grid and can take letter strings, e.g. 'A', as variables.
+- Exclusions can filter elements based on name, keywords, or color content.
+- Requirements can ensure specific elements, as well as specific colors for letter string variables.
+- Outputs bubble grid as 2D List*.
+
+*Can also output a String, but this is mainly intended for compatibility or testing rather than actual use.
+
 ## Change Log
+v1.0 - First Release
+
 ## Author's Info
