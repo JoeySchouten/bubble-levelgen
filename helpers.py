@@ -24,7 +24,7 @@ def _apply_element(element, list, config):
         attempts +=1
     
     # Apply the design, row by row.
-    for row in element.output:
+    for row in element_to_apply:
         for bubble in row:
 
             if element.override == True or list_to_return[index] == 0:
@@ -53,10 +53,10 @@ def _apply_fill(fill, list, excludes, required, config):
 def _color_swap_element(element):
     """Swap string color variables in elements to integers."""
     list_to_return = []
-    allowed_colors = element.allowed_colors.copy()
     color_dict = {}
+    allowed_colors = element.allowed_colors.copy()
 
-    # Poplulate the allowed color list with the standard 1-9 color ints if we did
+    # Populate the allowed color list with the standard 1-9 color ints if we did
     # not specify any specific allowed colors.
     if len(allowed_colors) == 0:
         for number in range(1, 10):
