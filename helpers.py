@@ -3,6 +3,9 @@ import random
 def _apply_element(element, list, config):
     """Apply the output of an element to the list of bubbles."""
     list_to_return = list
+    # We use an empty list in the required section as that is used for fills;
+    # for elements we use the allowed_colors section instead.
+    element_to_apply = _color_swap_element(element)
     index = 0
     is_odd_row = True
     attempts = 0
@@ -21,7 +24,7 @@ def _apply_element(element, list, config):
         attempts +=1
     
     # Apply the design, row by row.
-    for row in element.output:
+    for row in element_to_apply:
         for bubble in row:
 
             if element.override == True or list_to_return[index] == 0:
@@ -37,7 +40,7 @@ def _apply_element(element, list, config):
 def _apply_fill(fill, list, excludes, required, config):
     """Apply the output of a fill to the list of bubbles and return the new list."""
     list_to_return = list
-    fill_to_apply = _color_swap(fill, _filter_colors(list, 4, excludes), required)
+    fill_to_apply = _color_swap_fill(fill, _filter_colors(list, 4, excludes), required)
 
     # Overwrite any empty spaces with the fill or just overwrite anything with override=True.
     for index in range(len(fill_to_apply)):
@@ -47,8 +50,35 @@ def _apply_fill(fill, list, excludes, required, config):
 
     return list_to_return
 
-def _color_swap(element, color_list, required):
-    """Swap string color variables to integers."""
+def _color_swap_element(element):
+    """Swap string color variables in elements to integers."""
+    list_to_return = []
+    color_dict = {}
+    allowed_colors = element.allowed_colors.copy()
+
+    # Populate the allowed color list with the standard 1-9 color ints if we did
+    # not specify any specific allowed colors.
+    if len(allowed_colors) == 0:
+        for number in range(1, 10):
+            allowed_colors.append(number)
+
+    for row in element.output:
+        row_to_append = []
+        for bubble in row:
+            if isinstance(bubble, str):
+                if bubble not in color_dict:
+                    color_dict[bubble] = allowed_colors.pop(random.randint(0, len(allowed_colors) - 1))
+
+            if bubble in color_dict:
+                row_to_append.append(color_dict[bubble])
+            else:
+                row_to_append.append(bubble)
+
+        list_to_return.append(row_to_append)
+    return list_to_return
+
+def _color_swap_fill(element, color_list, required):
+    """Swap string color variables in fills to integers."""
     list_to_return = []
     required_colors = []
     color_dict = {}
