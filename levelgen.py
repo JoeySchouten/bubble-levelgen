@@ -102,24 +102,23 @@ def generate_level(
     queued_elements = []
     for element in elements_set:
         if element.name in required:
+            spent_difficulty += element.cost
             queued_elements.append(element)
-    
-    for element in queued_elements:
-        spent_difficulty += element.cost
-        if element.treat_as_fill:
-            bubble_list = _apply_fill(element, bubble_list, config)
-        else:
-            bubble_list = _apply_element(element, bubble_list, config)
 
-    # Roll design elements, apply them, and add the cost to what we have spent.
+    # Roll design elements and add the cost to what we have spent.
     elements_to_roll = _filter_list(excludes, elements_set)
     while spent_difficulty < level_difficulty and not only_required:
         selected_element = _weighted_roll(elements_to_roll)
         spent_difficulty += selected_element.cost
-        if selected_element.treat_as_fill:
-            bubble_list = _apply_fill(selected_element, bubble_list, excludes, required, config)
+        queued_elements.append(element)
+    
+    # Apply all of the queued elements.
+    for element in queued_elements:
+        print('applying ' + element.name)
+        if element.treat_as_fill:
+            bubble_list = _apply_fill(element, bubble_list, config)
         else:
-            bubble_list = _apply_element(selected_element, bubble_list, config)
+            bubble_list = _apply_element(element, bubble_list, config)
 
     # Apply the fill to our level
     bubble_list = _apply_fill(selected_fill, bubble_list, excludes, required, config)
