@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class DesignElement:
@@ -37,6 +37,7 @@ class DesignElement:
     y_min: int = 0
     y_max: int = 0
     treat_as_fill: bool = False
+    allowed_colors: list[int] = field(default_factory=list)
     override: bool = False
 
 @dataclass
