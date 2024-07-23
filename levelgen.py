@@ -17,6 +17,8 @@ class GeneratorConfig:
         difficulty added per level
     diff_per_star : int
         difficulty per star
+    minimum_difficulty : int
+        minimum difficulty for the generation, will be used if calculated difficulty is lower
     field_width : int
         the maximum number of bubbles in your top row
     field_height : int
@@ -27,6 +29,7 @@ class GeneratorConfig:
     base_difficulty: int = 20
     diff_per_level: int = 1
     diff_per_star: int = 1
+    minimum_difficulty: int = 40
     field_width: int = 8
     field_height: int = 8
     return_string: bool = False
@@ -67,6 +70,8 @@ def generate_level(
     level_difficulty = (config.base_difficulty * world
                         + config.diff_per_level * level 
                         + config.diff_per_star * stars)
+    if level_difficulty <= config.minimum_difficulty:
+        level_difficulty = config.minimum_difficulty
     spent_difficulty = 0
 
     # Make bubble list, due to the nature of hex grids, 

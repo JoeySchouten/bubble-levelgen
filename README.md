@@ -71,6 +71,8 @@ This module makes use of three different dataclasses, which together make up all
         difficulty added per level
     diff_per_star : int
         difficulty per star
+    minimum_difficulty : int
+        minimum difficulty for the generation, will be used if calculated difficulty is lower
     field_width : int
         the maximum number of bubbles in your top row
     field_height : int
@@ -156,6 +158,8 @@ Note: this bubble legend is based off of the project for which this code is writ
 - Added ability to use strings as variables in Design Elements.
 - Added 7 new basic Design Elements that use strings as part of their output.
 - Edited 'fireworks' Design Element to use strings.
+- Added new minimum difficulty to GeneratorConfig to help alleviate generation issues in low difficulties.
+  - Minimum difficulty will be used instead of calculated difficulty if the latter is lower.
 
 
 ### v1.0 - First Release
