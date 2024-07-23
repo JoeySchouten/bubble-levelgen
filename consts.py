@@ -10,24 +10,27 @@ class DesignElement:
     Parameters
     ----------
      name : str
-        element name - make sure this is unique
-    cost : int
-        difficulty cost
-    chance_weight : int
-        how much this element is weighted in determining which elements to pick
-    keywords: list
-        a list of strings that can be used to filter out the element from the available elements
-    output : list
-        the bubbles of which the design element consists
-    y_min : int, optional
-        minimal starting point for the design element, allows you to better position elements (default = 0)
-    y_max : int, optional
-        maximum starting point for the design element, allows you to better position elements (default = 0)
-    treat_as_fill : bool, optional
-        a flag used to determine whether to use the apply fill method rather than the apply element method
-        if True, make sure to supply a fill as single long list that spans your playing field (default = False)
-    override : bool, optional
-        a flag used to make the element overwrite any existing bubbles (default = False)
+          element name - make sure this is unique
+     cost : int
+          difficulty cost
+     chance_weight : int
+          how much this element is weighted in determining which elements to pick
+     keywords: list
+          a list of strings that can be used to filter out the element from the available elements
+     output : list
+          the bubbles of which the design element consists
+     y_min : int, optional
+          minimal starting point for the design element, allows you to better position elements (default = 0)
+     y_max : int, optional
+          maximum starting point for the design element, allows you to better position elements (default = 0)
+     treat_as_fill : bool, optional
+          a flag used to determine whether to use the apply fill method rather than the apply element method
+          if True, make sure to supply a fill as single long list that spans your playing field (default = False)
+     allowed_colors: list[int], optional
+          a list of valid choices for when the design uses letter variables. If provided as [], it will pick a random
+          color instead (default = [])
+     override : bool, optional
+          a flag used to make the element overwrite any existing bubbles (default = False)
     """
     name: str
     cost: int
