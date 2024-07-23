@@ -204,11 +204,22 @@ def _get_widest(output):
 
 def _jump_row(index, row, is_odd_row, config):
     """Skip to the next row."""
+    filled_bubbles = 0
+    for bubble in row:
+        if bubble == 0:
+            pass
+        else:
+            filled_bubbles = filled_bubbles + 1
+
     if is_odd_row:
-        index += (config.field_width - len(row))
+        index += (config.field_width - 1 - filled_bubbles)
+        print ('filled bubbles: ' + str(filled_bubbles))
+        print ('moving ' + str((config.field_width - 1 - filled_bubbles)))
         is_odd_row = False
     else:
-        index += (config.field_width - 1 - len(row))
+        index += (config.field_width - 1 - filled_bubbles)
+        print ('filled bubbles: ' + str(filled_bubbles))
+        print ('moving ' + str((config.field_width - 1 - filled_bubbles)))
         is_odd_row = True
     return index, is_odd_row
 
