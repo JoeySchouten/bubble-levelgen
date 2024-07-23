@@ -114,7 +114,6 @@ def generate_level(
     
     # Apply all of the queued elements.
     for element in queued_elements:
-        print('applying ' + element.name)
         if element.treat_as_fill:
             bubble_list = _apply_fill(element, bubble_list, config)
         else:
