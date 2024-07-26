@@ -160,9 +160,13 @@ Note: this bubble legend is based off of the project for which this code is writ
 - Edited 'fireworks' Design Element to use strings.
 - Added new minimum difficulty to GeneratorConfig to help alleviate generation issues in low difficulties.
   - Minimum difficulty will be used instead of calculated difficulty if the latter is lower.
-
+- Changed Element application method to be more consistent.
+ - Elements may need revision to add new leading and trailing zeroes.
 
 ### v1.0 - First Release
 - Initial release.
+
+## Known Bugs
+- Applying Elements can sometimes cause unwanted off-sets depending on the element's design.
 
 ## Author's Info

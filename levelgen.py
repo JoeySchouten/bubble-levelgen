@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from consts import DESIGNS, FILLS
 from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, \
-    _list_to_string, _weighted_roll
+    _list_to_string, _weighted_roll, _2d_to_list
 
 
 @dataclass
@@ -133,3 +133,4 @@ def generate_level(
         return _list_to_2D(bubble_list, config)
 
 
+_2d_to_list(DESIGNS[5], GeneratorConfig())
