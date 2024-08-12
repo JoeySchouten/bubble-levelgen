@@ -1,11 +1,12 @@
 import random
+import dataclasses
 
 def _apply_element(element, list, config):
     """Apply the output of an element to the list of bubbles."""
     list_to_return = list
     # We use an empty list in the required section as that is used for fills;
     # for elements we use the allowed_colors section instead.
-    element_to_apply = _color_swap_element(element)
+    
     index = 0
     is_odd_row = True
     attempts = 0
@@ -23,17 +24,16 @@ def _apply_element(element, list, config):
 
         attempts +=1
     
-    # Apply the design, row by row.
-    for row in element_to_apply:
-        for bubble in row:
+    element_to_apply = _2d_to_list(_color_swap_element(element), config)
 
+    for bubble in element_to_apply:
+        try:
             if element.override == True or list_to_return[index] == 0:
                 if bubble != 0:
                     list_to_return[index] = bubble
-            index += 1
-        
-        # Move to the next row.
-        index, is_odd_row = _jump_row(index, row, is_odd_row, config)
+        except:
+            pass
+        index += 1
         
     return list_to_return
 
@@ -55,6 +55,7 @@ def _color_swap_element(element):
     list_to_return = []
     color_dict = {}
     allowed_colors = element.allowed_colors.copy()
+    element_to_return = dataclasses.replace(element)
 
     # Populate the allowed color list with the standard 1-9 color ints if we did
     # not specify any specific allowed colors.
@@ -75,7 +76,9 @@ def _color_swap_element(element):
                 row_to_append.append(bubble)
 
         list_to_return.append(row_to_append)
-    return list_to_return
+
+    element_to_return.output = list_to_return
+    return element_to_return
 
 def _color_swap_fill(element, color_list, required):
     """Swap string color variables in fills to integers."""
@@ -177,7 +180,10 @@ def _get_starting_index(element, config):
     # Get correct x_axis offset depending on which row we start on.
     if y_axis % 2 == 0: 
         # Adding the 1 prevents it from accidentally cutting off the next row.
-        x_axis = random.randint(x_start, config.field_width - (widest_row_width + 1))
+        try:
+            x_axis = random.randint(x_start, config.field_width - (widest_row_width + 1))
+        except:
+            x_axis = random.randint(0, 1)
         is_odd_row = False
     else:
         x_axis = random.randint(x_start, (config.field_width - 1) - widest_row_width)
@@ -202,14 +208,38 @@ def _get_widest(output):
             widest_row = row
     return len(widest_row)
 
+def _2d_to_list(element, config):
+    output_to_return = []
+    field_width = config.field_width
+
+    # Go through the rows in the output; we use a non-pythonic solution so we can 
+    # easily access the length of the next row.
+    for index in range(0, len(element.output)):
+        # Append all of the bubbles and then apply a number of 0's to reach the
+        # starting point of the next row.
+        for bubble in element.output[index]:
+            output_to_return.append(bubble)
+        try:
+            for i in range(0, field_width - len(element.output[index+1])):
+                output_to_return.append(0)
+        except:
+            pass
+
+        #is_odd_row = not is_odd_row
+
+    return output_to_return
+
 def _jump_row(index, row, is_odd_row, config):
     """Skip to the next row."""
-    if is_odd_row:
-        index += (config.field_width - len(row))
-        is_odd_row = False
-    else:
-        index += (config.field_width - 1 - len(row))
-        is_odd_row = True
+    filled_bubbles = 0
+    for bubble in row:
+        if bubble == 0:
+            pass
+        else:
+            filled_bubbles = filled_bubbles + 1
+
+    index += (config.field_width - 1 - filled_bubbles)
+    is_odd_row = not is_odd_row
     return index, is_odd_row
 
 def _list_to_2D(list, config):

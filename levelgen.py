@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from consts import DESIGNS, FILLS
 from helpers import _apply_element, _apply_fill, _filter_list, _list_to_2D, \
-    _list_to_string, _weighted_roll
+    _list_to_string, _weighted_roll, _2d_to_list
 
 
 @dataclass
@@ -17,6 +17,8 @@ class GeneratorConfig:
         difficulty added per level
     diff_per_star : int
         difficulty per star
+    minimum_difficulty : int
+        minimum difficulty for the generation, will be used if calculated difficulty is lower
     field_width : int
         the maximum number of bubbles in your top row
     field_height : int
@@ -27,6 +29,7 @@ class GeneratorConfig:
     base_difficulty: int = 20
     diff_per_level: int = 1
     diff_per_star: int = 1
+    minimum_difficulty: int = 40
     field_width: int = 8
     field_height: int = 8
     return_string: bool = False
@@ -67,6 +70,8 @@ def generate_level(
     level_difficulty = (config.base_difficulty * world
                         + config.diff_per_level * level 
                         + config.diff_per_star * stars)
+    if level_difficulty <= config.minimum_difficulty:
+        level_difficulty = config.minimum_difficulty
     spent_difficulty = 0
 
     # Make bubble list, due to the nature of hex grids, 
@@ -114,7 +119,6 @@ def generate_level(
     
     # Apply all of the queued elements.
     for element in queued_elements:
-        print('applying ' + element.name)
         if element.treat_as_fill:
             bubble_list = _apply_fill(element, bubble_list, config)
         else:
@@ -129,3 +133,4 @@ def generate_level(
         return _list_to_2D(bubble_list, config)
 
 
+_2d_to_list(DESIGNS[5], GeneratorConfig())

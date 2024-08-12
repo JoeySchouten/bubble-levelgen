@@ -8,6 +8,8 @@ Elements are selected through a weighted roll, and 'cost' difficulty. The progra
 Additional parameters for elements and the function allow for more control over the output by filtering or queueing elements.
 The output is intended to be used in your own game.
 
+![Screenshot of an example level in the bubble shooter game this code is inisially designed for.](/assets/example.jpg)
+
 ## Installation
 This is intended to be used as a module or package. Add the file to the folder with your other modules and import it in your program.
 
@@ -69,6 +71,8 @@ This module makes use of three different dataclasses, which together make up all
         difficulty added per level
     diff_per_star : int
         difficulty per star
+    minimum_difficulty : int
+        minimum difficulty for the generation, will be used if calculated difficulty is lower
     field_width : int
         the maximum number of bubbles in your top row
     field_height : int
@@ -94,6 +98,9 @@ This module makes use of three different dataclasses, which together make up all
     treat_as_fill : bool, optional
         a flag used to determine whether to use the apply fill method rather than the apply element method
         if True, make sure to supply a fill as single long list that spans your playing field (default = False)
+    allowed_colors: list[int], optional
+        a list of valid choices for when the design uses letter variables. If provided as [], it will pick a random
+        color instead (default = [])
     override : bool, optional
         a flag used to make the element overwrite any existing bubbles (default = False)
 
@@ -147,6 +154,19 @@ Note: this bubble legend is based off of the project for which this code is writ
 *Can also output a String, but this is mainly intended for compatibility or testing rather than actual use.
 
 ## Change Log
-v1.0 - First Release
+### v1.1 - Letter Variables for Design Elements
+- Added ability to use strings as variables in Design Elements.
+- Added 7 new basic Design Elements that use strings as part of their output.
+- Edited 'fireworks' Design Element to use strings.
+- Added new minimum difficulty to GeneratorConfig to help alleviate generation issues in low difficulties.
+  - Minimum difficulty will be used instead of calculated difficulty if the latter is lower.
+- Changed Element application method to be more consistent.
+ - Elements may need revision to add new leading and trailing zeroes.
+
+### v1.0 - First Release
+- Initial release.
+
+## Known Bugs
+- Applying Elements can sometimes cause unwanted off-sets depending on the element's design.
 
 ## Author's Info
