@@ -27,9 +27,12 @@ def _apply_element(element, list, config):
     element_to_apply = _2d_to_list(_color_swap_element(element), config)
 
     for bubble in element_to_apply:
-        if element.override == True or list_to_return[index] == 0:
-            if bubble != 0:
-                list_to_return[index] = bubble
+        try:
+            if element.override == True or list_to_return[index] == 0:
+                if bubble != 0:
+                    list_to_return[index] = bubble
+        except:
+            pass
         index += 1
         
     return list_to_return
@@ -177,7 +180,10 @@ def _get_starting_index(element, config):
     # Get correct x_axis offset depending on which row we start on.
     if y_axis % 2 == 0: 
         # Adding the 1 prevents it from accidentally cutting off the next row.
-        x_axis = random.randint(x_start, config.field_width - (widest_row_width + 1))
+        try:
+            x_axis = random.randint(x_start, config.field_width - (widest_row_width + 1))
+        except:
+            x_axis = random.randint(0, 1)
         is_odd_row = False
     else:
         x_axis = random.randint(x_start, (config.field_width - 1) - widest_row_width)
@@ -221,7 +227,6 @@ def _2d_to_list(element, config):
 
         #is_odd_row = not is_odd_row
 
-    print(output_to_return)
     return output_to_return
 
 def _jump_row(index, row, is_odd_row, config):
